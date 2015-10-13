@@ -560,7 +560,7 @@ function lab_migration_check_code_number($number = '') {
 }
 
 function lab_migration_path() {
-  return $_SERVER['DOCUMENT_ROOT'] . base_path() . 'lab_migration_uploads/';
+  return $_SERVER['DOCUMENT_ROOT'] . base_path() . 'dwsim_uploads/lab_migration_uploads/';
 }
 
 /************************* USER VERIFICATION FUNCTIONS ************************/
@@ -580,7 +580,7 @@ function lab_migration_get_proposal() {
   $proposal_data = $proposal_q->fetchObject();
   if (!$proposal_data)
   {
-    drupal_set_message("You do not have any approved Lab migraion solution proposal. Please check the " . l('available', 'lab_migration/open_proposal') . " Lab migration proposal.", 'error');
+    drupal_set_message("You do not have any approved Lab migraion solution proposal. Please check the " . l('available', 'lab-migration/open-proposal') . " Lab migration proposal.", 'error');
     drupal_goto('');
   }
 	switch ($proposal_data->approval_status)
@@ -634,3 +634,20 @@ function lab_migration_get_category_name($category_id) {
  
  drupal_add_js(drupal_get_path('module', 'lab_migration') . '/js/lab_migration_ajax.js', array ('scope' => 'footer'));
  }*/
+ 
+ /*************************************************************************/
+ /***** Function To convert only first charater of string in uppercase ****/
+ /*************************************************************************/
+ function ucname($string) {
+    $string =ucwords(strtolower($string));
+
+    foreach (array('-', '\'') as $delimiter) {
+      if (strpos($string, $delimiter)!==false) {
+        $string =implode($delimiter, array_map('ucfirst', explode($delimiter, $string)));
+      }
+    }
+    return $string;
+}
+ 
+ 
+ 

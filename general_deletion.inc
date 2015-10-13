@@ -77,7 +77,7 @@ function lab_migration_delete_solution($solution_id)
     return FALSE;
 
   /* removing code folder */
-  $ex_path = $experiment_data->proposal_id . '/EXP' . $experiment_data->number . '/CODE' . $solution_data->code_number;
+  $ex_path = $experiment_data->directory_name . '/EXP' . $experiment_data->number . '/CODE' . $solution_data->code_number;
   $dir_path = $root_path . $ex_path;
   if (is_dir($dir_path))
   {

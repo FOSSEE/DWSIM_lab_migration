@@ -13,7 +13,7 @@ function lab_migration_list_experiments()
 
   $return_html = '<strong>Title of the Lab:</strong><br />' . $proposal_data->lab_title . '<br /><br />';
   $return_html .= '<strong>Proposer Name:</strong><br />' . $proposal_data->name_title . ' ' . $proposal_data->name . '<br /><br />';
-  $return_html .= l('Upload Solution', 'lab_migration/code/upload') . '<br />';
+  $return_html .= l('Upload Solution', 'lab-migration/code/upload') . '<br />';
 
   /* get experiment list */
   $experiment_rows = array();
@@ -48,7 +48,7 @@ function lab_migration_list_experiments()
     		default: $solution_status = "Unknown"; break;
     		}
     		if ($solution_data->approval_status == 0) {
-    			$experiment_rows[] = array("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" . $solution_data->code_number . "   " . $solution_data->caption, '', $solution_status, l('Delete', 'lab_migration/code/delete/' . $solution_data->id));
+    			$experiment_rows[] = array("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" . $solution_data->code_number . "   " . $solution_data->caption, '', $solution_status, l('Delete', 'lab-migration/code/delete/' . $solution_data->id));
     		} else {
     			$experiment_rows[] = array("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" . $solution_data->code_number . "   " . $solution_data->caption, '', $solution_status, '');
     		}
@@ -70,7 +70,7 @@ function lab_migration_list_experiments()
     				case 'U': $code_file_type = 'Unknown'; break;
     				default: $code_file_type = 'Unknown'; break;
     				}
-    				$experiment_rows[] = array("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" . l($solution_files_data->filename, 'lab_migration/download/file/' . $solution_files_data->id), $code_file_type, '', '');
+    				$experiment_rows[] = array("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" . l($solution_files_data->filename, 'lab-migration/download/file/' . $solution_files_data->id), $code_file_type, '', '');
     			}
     		}
 				/* get dependencies files */
@@ -88,7 +88,7 @@ function lab_migration_list_experiments()
                       $query->condition('id', $dependency_data->dependency_id);
                       $dependency_files_q = $query->execute();
 					$dependency_files_data = $dependency_files_q->fetchObject();
-					$experiment_rows[] = array("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" . l($dependency_files_data->filename, 'lab_migration/download/dependency/' . $dependency_files_data->id), 'Dependency', '', '');
+					$experiment_rows[] = array("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" . l($dependency_files_data->filename, 'lab-migration/download/dependency/' . $dependency_files_data->id), 'Dependency', '', '');
 				}
     	}
     }
@@ -101,7 +101,7 @@ function lab_migration_list_experiments()
   return $return_html;
 }
 
-function lab_migration_upload_code_form($form_state)
+function lab_migration_upload_code_form($form,$form_state)
 {
  
   global $user;
@@ -195,21 +195,16 @@ function lab_migration_upload_code_form($form_state)
     '#type' => 'select',
     '#title' => t('Operating System used'),
     '#options' => array(
-      0 => '--- Please select ---',
       'Linux' => 'Linux',
       'Windows' => 'Windows',
       'Mac' => 'Mac'
     ),
     '#required' => TRUE,
   );
-  $form['esim_version'] = array(
+  $form['dwsim_version'] = array(
     '#type' => 'select',
-    '#title' => t('esim version used'),
-    '#options' => array(
-      0 => '--- Please select ---',
-      '1.0.0' => '1.0.0',
-      'Older' => 'Older Version'
-    ),
+    '#title' => t('DWSIM version used'),
+    '#options' => list_dwsim_software_version(),
     '#required' => TRUE,
   );
   $form['toolbox_used'] = array(
@@ -219,7 +214,7 @@ function lab_migration_upload_code_form($form_state)
   );
   $form['code_warning'] = array(
     '#type' => 'item',
-    '#title' => t('Upload all the eSim project files in .zip format'),
+    '#title' => t('Upload all the dwsim project files in .zip format'),
     '#prefix' => '<div style="color:red">',
     '#suffix' => '</div>',
   );
@@ -280,7 +275,7 @@ function lab_migration_upload_code_form($form_state)
 
   $form['existing_depfile']['dep_upload'] = array(
       '#type' => 'item',
-      '#markup' => l('Upload New Depedency Files', 'lab_migration/code/upload_dep'),
+      '#markup' => l('Upload New Depedency Files', 'lab-migration/code/upload_dep'),
   );
   /************ END OF EXISTING DEPENDENCIES **************/
 
@@ -333,7 +328,7 @@ function lab_migration_upload_code_form($form_state)
 
   $form['cancel'] = array(
     '#type' => 'markup',
-    '#value' => l(t('Cancel'), 'lab_migration/code'),
+    '#value' => l(t('Cancel'), 'lab-migration/code'),
   );
   return $form;
 }
@@ -349,8 +344,8 @@ function lab_migration_upload_code_form_validate($form, &$form_state)
   if(!$form_state['values']['os_used'])
     form_set_error('os_used', t('Please select the operating system used.'));
 
-  if(!$form_state['values']['esim_version'])
-    form_set_error('esim_version', t('Please select the esim version used.'));
+  if(!$form_state['values']['dwsim_version'])
+    form_set_error('dwsim_version', t('Please select the dwsim version used.'));
 
   if (isset($_FILES['files']))
   {
@@ -387,7 +382,8 @@ function lab_migration_upload_code_form_validate($form, &$form_state)
           break;
         }
         $allowed_extensions = explode(',' , $allowed_extensions_str);
-        $temp_extension = end(explode('.', strtolower($_FILES['files']['name'][$file_form_name])));
+        $tmp_ext = explode('.', strtolower($_FILES['files']['name'][$file_form_name]));
+        $temp_extension = end($tmp_ext);
         if (!in_array($temp_extension, $allowed_extensions))
           form_set_error($file_form_name, t('Only file with ' . $allowed_extensions_str . ' extensions can be uploaded.'));
         if ($_FILES['files']['size'][$file_form_name] <= 0)
@@ -445,6 +441,7 @@ function lab_migration_upload_code_form_submit($form, &$form_state) {
   }
 
   $proposal_id = $proposal_data->id;
+  $proposal_drectory = $proposal_data->directory_name;
 
   /************************ check experiment details ************************/
   $experiment_id = (int)$form_state['values']['experiment'];
@@ -459,11 +456,11 @@ function lab_migration_upload_code_form_submit($form, &$form_state) {
   if (!$experiment_data)
   {
     drupal_set_message("Invalid experiment seleted", 'error');
-    drupal_goto('lab_migration/code');
+    drupal_goto('lab-migration/code');
   }
 
   /* create proposal folder if not present */
-  $dest_path = $proposal_id . '/';
+  $dest_path = $proposal_drectory . '/';
   if (!is_dir($root_path . $dest_path))
     mkdir($root_path . $dest_path);
 
@@ -481,15 +478,15 @@ function lab_migration_upload_code_form_submit($form, &$form_state) {
     if ($cur_solution_d->approval_status == 1)
     {
       drupal_set_message(t("Solution already approved. Cannot overwrite it."), 'error');
-      drupal_goto('lab_migration/code');
+      drupal_goto('lab-migration/code');
       return;
     } else if ($cur_solution_d->approval_status == 0) {
       drupal_set_message(t("Solution is under pending review. Delete the solution and reupload it."), 'error');
-      drupal_goto('lab_migration/code');
+      drupal_goto('lab-migration/code');
       return;
     } else {
       drupal_set_message(t("Error uploading solution. Please contact administrator."), 'error');
-      drupal_goto('lab_migration/code');
+      drupal_goto('lab-migration/code');
       return;
     }
   }
@@ -505,7 +502,7 @@ function lab_migration_upload_code_form_submit($form, &$form_state) {
     mkdir($root_path . $dest_path);
 
   /* creating solution database entry */
-  $query = "INSERT INTO {lab_migration_solution} (experiment_id, approver_uid, code_number, caption, approval_date, approval_status, timestamp, os_used, esim_version, toolbox_used) VALUES (:experiment_id, :approver_uid, :code_number, :caption, :approval_date, :approval_status, :timestamp, :os_used, :esim_version, :toolbox_used)";
+  $query = "INSERT INTO {lab_migration_solution} (experiment_id, approver_uid, code_number, caption, approval_date, approval_status, timestamp, os_used, dwsim_version, toolbox_used) VALUES (:experiment_id, :approver_uid, :code_number, :caption, :approval_date, :approval_status, :timestamp, :os_used, :dwsim_version, :toolbox_used)";
     $args = array(
                     ":experiment_id" => $experiment_id,
                     ":approver_uid" => 0,
@@ -515,7 +512,7 @@ function lab_migration_upload_code_form_submit($form, &$form_state) {
                     ":approval_status" => 0,
                     ":timestamp" => time(),
                     ":os_used" => $form_state['values']['os_used'],
-                    ":esim_version" => $form_state['values']['esim_version'],
+                    ":dwsim_version" => $form_state['values']['dwsim_version'],
                     ":toolbox_used" => $form_state['values']['toolbox_used']
             );
   $solution_id = db_query($query, $args, array('return' => Database::RETURN_INSERT_ID));
@@ -590,7 +587,7 @@ function lab_migration_upload_code_form_submit($form, &$form_state) {
   if (!drupal_mail('lab_migration', 'solution_uploaded', $email_to, language_default(), $param, variable_get('lab_migration_from_email', NULL), TRUE))
     drupal_set_message('Error sending email message.', 'error');
 
-  drupal_goto('lab_migration/code');
+  drupal_goto('lab-migration/code');
 }
 
 /******************************************************************************/
@@ -636,10 +633,23 @@ function _list_of_dependency_files()
     $temp_caption = '';
     if ($dependency_files_data->caption)
       $temp_caption .= ' (' . $dependency_files_data->caption . ')';
-    $dependency_files[$dependency_files_data->id] = l($dependency_files_data->filename . $temp_caption, 'lab_migration/download/dependency/' . $dependency_files_data->id, array('attributes' => array('class' => $dependency_files_data->proposal_id)));
+    $dependency_files[$dependency_files_data->id] = l($dependency_files_data->filename . $temp_caption, 'lab-migration/download/dependency/' . $dependency_files_data->id, array('attributes' => array('class' => $dependency_files_data->proposal_id)));
     $dependency_files_class[$dependency_files_data->id] = $dependency_files_data->proposal_id;
     $dependency_files_value[$dependency_files_data->id] = $dependency_files_data->proposal_id;
   }
   return array($dependency_files, $dependency_files_class,  $dependency_files_value);
+}
+
+function list_dwsim_software_version(){
+      $dwsim_version = array(0 => '-Select-');  
+			$query = db_select('dwsim_software_version');
+				$query->fields('dwsim_software_version');
+				//$query->orderBy('city', 'ASC');
+				$dwsim_version_list = $query->execute();
+			while ($dwsim_version_list_data = $dwsim_version_list->fetchObject())
+			{
+				$dwsim_version[$dwsim_version_list_data->dwsim_version] = $dwsim_version_list_data->dwsim_version;
+			}
+			return $dwsim_version;
 }
 

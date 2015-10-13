@@ -104,25 +104,8 @@ function lab_migration_category_all()
             $proposal_q = $query->execute();
   while ($proposal_data = $proposal_q->fetchObject())
   {
-  	switch ($proposal_data->category)
-  	{
-    case 0: $category_data = 'Not Selected'; break;
-    case 1: $category_data = 'Fluid Mechanics'; break;
-    case 2: $category_data = 'Control Theory & Control Systems'; break;
-    case 3: $category_data = 'Chemical Engineering'; break;
-    case 4: $category_data = 'Thermodynamics'; break;
-    case 5: $category_data = 'Mechanical Engineering'; break;
-    case 6: $category_data = 'Signal Processing'; break;
-    case 7: $category_data = 'Digital Communications'; break;
-    case 8: $category_data = 'Electrical Technology'; break;
-    case 9: $category_data = 'Mathematics & Pure Science'; break;
-    case 10: $category_data = 'Analog Electronics'; break;
-    case 11: $category_data = 'Digital Electronics'; break;
-    case 12: $category_data = 'Computer Programming'; break;
-    case 13: $category_data = 'Others'; break;
-    default: $category_data = 'Unknown'; break;
-  	}
-    $proposal_rows[] = array(date('d-m-Y', $proposal_data->creation_date), l($proposal_data->name, 'user/' . $proposal_data->uid), $proposal_data->lab_title, $proposal_data->department, $category_data, l('Edit Category', 'lab-migration/manage-proposal/category/edit/' . $proposal_data->id));
+  	
+    $proposal_rows[] = array(date('d-m-Y', $proposal_data->creation_date), l($proposal_data->name, 'user/' . $proposal_data->uid), $proposal_data->lab_title, $proposal_data->department, $proposal_data->category, l('Edit Category', 'lab-migration/manage-proposal/category/edit/' . $proposal_data->id));
   }
 
   $proposal_header = array('Date of Submission', 'Name', 'Title of the Lab', 'Department', 'Category', 'Action');
@@ -268,6 +251,11 @@ function lab_migration_proposal_approval_form($form, $form_state)
     '#type' => 'textarea',
     '#title' => t('Reason for disapproval'),
     '#attributes' =>array('placeholder' => t('Enter reason for disapproval in minimum 30 characters '), 'cols' => 50, 'rows' => 4),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="approval"]' => array('value' => '2'),
+      ),
+    ),
   );
 
   $form['submit'] = array(
@@ -283,6 +271,14 @@ function lab_migration_proposal_approval_form($form, $form_state)
   return $form;
 }
 
+function lab_migration_proposal_approval_form_validate($form, &$form_state)
+{
+if($form_state['values']['approval'] == 2){
+   if($form_state['values']['message'] == ''){
+   form_set_error('message', t('Reason for disapproval could not be empty'));
+   }
+}
+}
 function lab_migration_proposal_approval_form_submit($form, &$form_state)
 {
 	global $user;
@@ -312,7 +308,7 @@ function lab_migration_proposal_approval_form_submit($form, &$form_state)
   }
 
   if ($form_state['values']['approval'] == 1) {
-  	$query = "UPDATE {lab_migration_proposal} SET approver_uid = :uid, approval_date = :date, approval_status = 1 WHERE id = :proposal_id"; 
+  	$query = "UPDATE {lab_migration_proposal} SET approver_uid = :uid, approval_date = :date, approval_status = 1, solution_status = 2 WHERE id = :proposal_id"; 
   	$args = array(
   		":uid" => $user->uid, 
   		":date" =>time(), 
@@ -520,7 +516,7 @@ function lab_migration_proposal_status_form($form,$form_state)
   );
 
   $form['cancel'] = array(
-    '#type' => 'item',
+    '#type' => 'markup',
     '#markup' => l(t('Cancel'), 'lab-migration/manage-proposal/all'),
   );
 
@@ -555,30 +551,37 @@ function lab_migration_proposal_status_form_submit($form, &$form_state)
   }
 
   /* set the book status to completed */
-  if ($form_state['values']['completed'] == 1)
+ if ($form_state['values']['completed'] == 1)
   {
-    $query = "UPDATE {lab_migration_proposal} SET approval_status = 3 and expected_completion_date= :date WHERE id = :proposal_id";
+    $up_query = "UPDATE lab_migration_proposal SET approval_status = :approval_status , expected_completion_date = :expected_completion_date WHERE id = :proposal_id";
     $args = array(
+     ":approval_status" => '3',
      ":proposal_id" => $proposal_id,
-     ":date" => time(),
+     ":expected_completion_date" => time(),
      );
-    $result = db_query($query, $args);
+    
+    $result = db_query($up_query,$args);
+    CreateReadmeFileLabMigration($proposal_id);
+    if(!$result){
+            drupal_set_message('Error in update status', 'error');
+      return;
 
+      }
     /* sending email */
     $user_data = user_load($proposal_data->uid);
     $email_to = $user_data->mail;
     $param['proposal_completed']['proposal_id'] = $proposal_id;
     $param['proposal_completed']['user_id'] = $proposal_data->uid;
-    if (!drupal_mail('lab_migration', 'proposal_completed', $email_to , language_default(), $param, variable_get('lab_migration_from_email', NULL), TRUE))
+    if (!drupal_mail('lab_migration', 'proposal_completed', $email_to , language_default(), $param, variable_get('lab_migration_from_email', NULL), TRUE)){
       drupal_set_message('Error sending email message.', 'error');
-
+}
     $email_to = $user->mail . ', ' . variable_get('lab_migration_emails', '');;
-    if (!drupal_mail('lab_migration', 'proposal_completed', $email_to , language_default(), $param, variable_get('lab_migration_from_email', NULL), TRUE))
+    if (!drupal_mail('lab_migration', 'proposal_completed', $email_to , language_default(), $param, variable_get('lab_migration_from_email', NULL), TRUE)){
       drupal_set_message('Error sending email message.', 'error');
- 
+ }
     drupal_set_message('Congratulations! Lab Migration proposal has been marked as completed. User has been notified of the completion.', 'status');
   }
-  drupal_goto('lab-migration/manage-proposal');
+ drupal_goto('lab-migration/manage-proposal');
   return;
 }
 
@@ -647,17 +650,7 @@ function lab_migration_proposal_edit_form($form, $form_state)
   $form['department'] = array(
     '#type' => 'select',
     '#title' => t('Department/Branch'),
-    '#options' => array('' => 'Please select...',
-                        'Computer Engineering' => 'Computer Engineering',
-                        'Electrical Engineering' => 'Electrical Engineering',
-                        'Electronics Engineering' => 'Electronics Engineering',
-                        'Chemical Engineering' => 'Chemical Engineering',
-                        'Instrumentation Engineering' => 'Instrumentation Engineering',
-                        'Mechanical Engineering' => 'Mechanical Engineering',
-                        'Civil Engineering' => 'Civil Engineering',
-                        'Physics' => 'Physics',
-                        'Mathematics' => 'Mathematics',
-                        'Others' => 'Others'),
+    '#options' => _list_of_departments(),
     '#required' => TRUE,
     '#default_value' => $proposal_data->department,
   );
@@ -665,79 +658,89 @@ function lab_migration_proposal_edit_form($form, $form_state)
     '#type' => 'textfield',
     '#title' => t('University/Institute'),
     '#size' => 30,
-    '#maxlength' => 50,
+    '#maxlength' => 50,    
     '#required' => TRUE,
     '#default_value' => $proposal_data->university,
   );
-$form['city'] = array(
-    '#type' => 'textfield',
-    '#title' => t('City/ Village'),
-    '#size' => 80,
-    '#maxlength' => 150,
-    '#default_value' => $proposal_data->city,
+  $form['country'] = array(
+    '#type' => 'select',    
+    '#title' => t('Country'),
+    '#options' => array(
+                'India' => 'India',
+                'Others' => 'Others',
+                ),
+    '#default_value' => $proposal_data->country,
     '#required' => TRUE,
-    '#attributes' =>array('placeholder' =>'Insert location of your institute/ university....'),
- );
+    '#tree' => TRUE,
+    '#validated' => TRUE,
+  );
+  $form['other_country'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Other than India'),
+    '#size' => 100,
+    '#default_value' => $proposal_data->country,
+    '#attributes' =>array('placeholder' => t('Enter your country name')),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="country"]' => array('value' => 'Others'),
+      ),
+    ),
+  );
+  $form['other_state'] = array(
+    '#type' => 'textfield',
+    '#title' => t('State other than India'),
+    '#size' => 100,
+    '#attributes' =>array('placeholder' => t('Enter your state/region name')),
+    '#default_value' => $proposal_data->state,
+    '#states' => array(
+      'visible' => array(
+        ':input[name="country"]' => array('value' => 'Others'),
+      ),
+    ),
+  );
+  $form['other_city'] = array(
+    '#type' => 'textfield',
+    '#title' => t('City other than India'),
+    '#size' => 100,
+    '#attributes' =>array('placeholder' => t('Enter your city name')),
+    '#default_value' => $proposal_data->city,
+    '#states' => array(
+      'visible' => array(
+        ':input[name="country"]' => array('value' => 'Others'),
+      ),
+    ),
+  );  
+  $form['all_state'] = array(
+    '#type' => 'select',    
+    '#title' => t('State'),
+    '#options' => _list_of_states(),
+    '#default_value' => $proposal_data->state,
+    '#validated' => TRUE,
+    '#states' => array(
+      'visible' => array(
+        ':input[name="country"]' => array('value' => 'India'),
+      ),
+    ),
+  ); 
+  $form['city'] = array(
+    '#type' => 'select',
+    '#title' => t('City'),
+    '#options' => _list_of_cities(), 
+    '#default_value' => $proposal_data->city,   
+    '#states' => array(
+      'visible' => array(
+        ':input[name="country"]' => array('value' => 'India'),
+      ),
+    ),
+  ); 
 $form['pincode'] = array(
     '#type' => 'textfield',
     '#title' => t('Pincode'),
     '#size' => 30,
-    '#maxlength' => 6,
-    '#required' => TRUE,
+    '#maxlength' => 6,    
     '#default_value' => $proposal_data->pincode,
     '#attributes' =>array('placeholder' =>'Insert pincode of your city/ village....'),
 );
-$form['all_state'] = array(
-    '#type' => 'select',
-    '#title' => t('State'),
-    '#options' => array(
-                                 '0' => 'Please select...',
-                                         'Andhra Pradesh' => t('Andhra Pradesh'),
-                                         'Arunachal Pradesh' => 'Arunachal Pradesh',
-                                         'Assam' => 'Assam',
-                                         'Bihar' => 'Bihar',
-                                         'Chhattisgarh' => 'Chhattisgarh',
-                                         'Goa' => 'Goa',
-                                         'Gujarat' => 'Gujarat',
-                                         'Haryana' => 'Haryana',
-                                         'Himachal Pradesh' => 'Himachal Pradesh',
-                                         'Jammu & Kashmir' => 'Jammu & Kashmir',
-                                         'Jharkhand' => 'Jharkhand',
-                                         'Karnataka' => 'Karnataka',
-                                         'Kerala' => 'Kerala',
-                                         'Madhya Pradesh' => 'Madhya Pradesh',
-                                         'Maharashtra' => 'Maharashtra',
-                                         'Manipur' => 'Manipur',
-                                         'Meghalaya' => 'Meghalaya',
-                                         'Mizoram' => 'Mizoram',
-                                         'Nagaland' => 'Nagaland',
-                                         'Odisha' => 'Odisha',
-                                         'Punjab' => 'Punjab',
-                                         'Rajasthan' => 'Rajasthan',
-                                         'Sikkim' => 'Sikkim',
-                                         'Tamil Nadu' => 'Tamil Nadu',
-                                         'Telangana' => 'Telangana',
-                                         'Tripura' => 'Tripura',
-                                         'Uttarakhand' => 'Uttarakhand',
-                                         'Uttar Pradesh'=> 'Uttar Pradesh',
-                                         'West Bengal' => 'West Bengal',
-                                         'Andaman & Nicobar' => 'Andaman & Nicobar',
-                                         'Chandigarh' => 'Chandigarh',
-                                         'Dadra and Nagar Haveli' => 'Dadra and Nagar Haveli',
-                                         'Daman & Diu' => 'Daman & Diu',
-                                         'Delhi' => 'Delhi',
-                                         'Lakshadweep' => 'Lakshadweep',
-                                         'Puducherry' => 'Puducherry',
-                                         'Others' => 'Others',
-                ),
-    '#required' => TRUE,
-    '#tree' => TRUE,
-    '#validated' => TRUE,
-    '#default_value' => $proposal_data->state,
- );
-
-
-
   $form['lab_title'] = array(
     '#type' => 'textfield',
     '#title' => t('Title of the Lab'),
@@ -1212,20 +1215,7 @@ function lab_migration_category_edit_form($form,$form_state)
   $form['category'] = array(
     '#type' => 'select',
     '#title' => t('Category'),
-    '#options' => array(0 => 'Please select',
-                        1 => 'Fluid Mechanics',
-                        2 => 'Control Theory & Control Systems',
-                        3 => 'Chemical Engineering',
-                        4 => 'Thermodynamics',
-                        5 => 'Mechanical Engineering',
-                        6 => 'Signal Processing',
-                        7 => 'Digital Communications',
-                        8 => 'Electrical Technology',
-                        9 => 'Mathematics & Pure Science',
-                        10 => 'Analog Electronics',
-                        11 => 'Digital Electronics',
-                        12 => 'Computer Programming',
-                        13 => 'Others'),
+    '#options' => _list_of_departments(),
     '#required' => TRUE,
     '#default_value' => $proposal_data->category,
   );
@@ -1266,7 +1256,7 @@ function lab_migration_category_edit_form_submit($form, &$form_state)
     return;
   }
 
-  $query = "UPDATE {lab_migration_proposal} SET category = category WHERE id = :proposal_id";
+  $query = "UPDATE {lab_migration_proposal} SET category = :category WHERE id = :proposal_id";
      $args = array( 
           ":category" => $form_state['values']['category'],
           ":proposal_id" => $proposal_data->id
@@ -1277,3 +1267,66 @@ function lab_migration_category_edit_form_submit($form, &$form_state)
   drupal_goto('lab-migration/manage-proposal/category');
 }
 
+
+function _list_of_departments(){
+			$department = array(0 => '-Select-');  
+			$query = db_select('list_of_departments');
+				$query->fields('list_of_departments');
+				$query->orderBy('id', 'DESC');
+				$department_list = $query->execute();
+			while ($department_list_data = $department_list->fetchObject())
+			{
+				$department[$department_list_data->department] = $department_list_data->department;
+			}
+			return $department;
+}
+function _list_of_states(){
+			$states = array(0 => '-Select-');  
+			$query = db_select('list_states_of_india');
+				$query->fields('list_states_of_india');
+				
+				//$query->orderBy('', '');
+				$states_list = $query->execute();
+			while ($states_list_data = $states_list->fetchObject())
+			{
+				$states[$states_list_data->state] = $states_list_data->state;
+			}
+			return $states;
+}
+
+
+function _list_of_cities(){
+			$city = array();  
+			$query = db_select('list_cities_of_india');
+				$query->fields('list_cities_of_india');
+				$query->orderBy('city', 'ASC');
+				$city_list = $query->execute();
+			while ($city_list_data = $city_list->fetchObject())
+			{
+				$city[$city_list_data->city] = $city_list_data->city;
+			}
+			return $city;
+}
+
+function CreateReadmeFileLabMigration($proposal_id){
+
+   $result = db_query("
+                        SELECT * from lab_migration_proposal WHERE id = :proposal_id", 
+                        array(":proposal_id" => $proposal_id)
+                     );
+   $proposal_data = $result->fetchObject();
+   $root_path = lab_migration_path();
+   $readme_file = fopen($root_path . $proposal_data->directory_name."/README.txt", "w") or die("Unable to open file!");
+      $txt = "";
+	   $txt .= "Title Of The Lab: ".$proposal_data->lab_title."\n";
+		$txt .= "Proposar Name: ".$proposal_data->name_title. " ".$proposal_data->name."\n";
+		$txt .= "Department: ".$proposal_data->department."\n";
+		$txt .= "University: ".$proposal_data->university."\n";
+		$txt .= "Categoery: ".$proposal_data->department."\n\n";
+		$txt .= "Solution Provider Name: ".$proposal_data->solution_provider_name_title. " ".$proposal_data->solution_provider_name."\n";
+		$txt .= "Solution Provider University: ".$proposal_data->solution_provider_university."\n";  
+	fwrite($readme_file, $txt);		
+	fclose($readme_file);
+	return $txt;
+		
+}		

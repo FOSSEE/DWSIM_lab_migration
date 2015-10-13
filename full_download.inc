@@ -134,10 +134,11 @@ function lab_migration_download_full_lab()
   //$lab_q = db_query("SELECT * FROM {lab_migration_proposal} WHERE id = %d", $lab_id);
   $query = db_select('lab_migration_proposal');
               $query->fields('lab_migration_proposal');
+              
               $query->condition('id', $lab_id);
   $lab_q = $query->execute();
   $lab_data = $lab_q->fetchObject();
-  $LAB_PATH = $lab_data->lab . '/';
+  $LAB_PATH = $lab_data->lab_title . '/';
 
   /* zip filename */
   $zip_filename = $root_path . 'zip-' . time() . '-' . rand(0, 999999) . '.zip';
@@ -176,7 +177,7 @@ function lab_migration_download_full_lab()
                   $solution_dependency_files_q = $query->execute();
       while ($solution_files_row = $solution_files_q->fetchObject())
       {
-        $zip->addFile($root_path . $solution_files_row->filepath, $LAB_PATH . $APPROVE_PATH . $EXP_PATH . $CODE_PATH . $solution_files_row->filename);
+        $zip->addFile($root_path . $solution_files_row->filepath, $APPROVE_PATH . $EXP_PATH . $CODE_PATH . $solution_files_row->filename);
       }
       /* dependency files */
       while ($solution_dependency_files_row = $solution_dependency_files_q->fetchObject())
@@ -188,7 +189,7 @@ function lab_migration_download_full_lab()
                     $query->range(0, 1);
                     $dependency_file_data = $query->execute()->fetchObject();
         if ($dependency_file_data)
-          $zip->addFile($root_path . $dependency_file_data->filepath, $LAB_PATH . $APPROVE_PATH . $EXP_PATH . $CODE_PATH . 'DEPENDENCIES/' . $dependency_file_data->filename);
+          $zip->addFile($root_path . $dependency_file_data->filepath, $APPROVE_PATH . $EXP_PATH . $CODE_PATH . 'DEPENDENCIES/' . $dependency_file_data->filename);
       }
     }
 
@@ -246,7 +247,7 @@ function lab_migration_download_full_lab()
     unlink($zip_filename);
   } else {
     drupal_set_message("There are no solutions in this lab to download", 'error');
-    drupal_goto('lab_migration/code_approval/bulk');
+    drupal_goto('lab-migration/code-approval/bulk');
   }
 }
 

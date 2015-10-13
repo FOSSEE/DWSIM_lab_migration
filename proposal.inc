@@ -210,7 +210,7 @@ function lab_migration_proposal_form($form,$form_state)
 			$form['lab_experiment_description-' . $counter] = array(
 			'#type' => 'textarea',
 			'#required' => FALSE,
-			'#attributes' =>array('placeholder' => t('Enter Description for your experiment '.$counter)),
+			'#attributes' =>array('placeholder' => t('Enter Description for your experiment '.$counter),'cols' => 50, 'rows' => 4),
 			'#title' => t('Description for Experiment ') . $counter,
 			'#states' => array(
             		'invisible' => array(
@@ -340,9 +340,16 @@ function lab_migration_proposal_form_submit($form, &$form_state)
 
   /* inserting the user proposal */
     $v = $form_state["values"];
+    $lab_title = ucname($v['lab_title']);
+    $university = ucname($v['university']); 
+    $dir_name = $lab_title." ". $university;
+    $directory_name = str_replace("__","_",str_replace(" ","_",$dir_name));
   $result = "INSERT INTO {lab_migration_proposal} 
-    (uid, approver_uid, name_title, name, contact_ph, department, university, city, pincode, state, country, lab_title, approval_status, solution_status, solution_provider_uid, solution_display, creation_date, approval_date, solution_date, solution_provider_name_title, solution_provider_name, solution_provider_contact_ph, solution_provider_department, solution_provider_university) VALUES
-    (:uid, :approver_uid, :name_title, :name, :contact_ph, :department, :university, :city, :pincode, :state, :country, :lab_title, :approval_status, :solution_status, :solution_provider_uid, :solution_display, :creation_date, :approval_date, :solution_date, :solution_provider_name_title, :solution_provider_name, :solution_provider_contact_ph, :solution_provider_department, :solution_provider_university)";
+    (uid, approver_uid, name_title, name, contact_ph, department, university, city, pincode, state, country, lab_title, approval_status, solution_status, solution_provider_uid, solution_display, creation_date, approval_date, solution_date, solution_provider_name_title, solution_provider_name, solution_provider_contact_ph, solution_provider_department, solution_provider_university, directory_name) VALUES
+    (:uid, :approver_uid, :name_title, :name, :contact_ph, :department, :university, :city, :pincode, :state, :country,
+     :lab_title, :approval_status, :solution_status, :solution_provider_uid, :solution_display, :creation_date, 
+     :approval_date, :solution_date, :solution_provider_name_title, :solution_provider_name,
+      :solution_provider_contact_ph, :solution_provider_department, :solution_provider_university, :directory_name)";
   $args= array(
     ":uid" => $user->uid,
     ":approver_uid" => 0,
@@ -367,7 +374,8 @@ function lab_migration_proposal_form_submit($form, &$form_state)
     ":solution_provider_name" => $solution_provider_name,
     ":solution_provider_contact_ph" => $solution_provider_contact_ph,
     ":solution_provider_department" => $solution_provider_department,
-    ":solution_provider_university" => $solution_provider_university
+    ":solution_provider_university" => $solution_provider_university,
+    ":directory_name" => $directory_name
   );
   $proposal_id = db_query($result, $args, array('return' => Database::RETURN_INSERT_ID));  
   if (!$proposal_id)
@@ -384,9 +392,10 @@ function lab_migration_proposal_form_submit($form, &$form_state)
   	$experiment_field_name = 'lab_experiment-' . $counter;
 	$experiment_description='lab_experiment_description-' . $counter;
   	if (strlen(trim($form_state['values'][$experiment_field_name])) >= 1) {
-        $query = "INSERT INTO {lab_migration_experiment} (proposal_id, number, title,description) VALUES (:proposal_id, :number, :experiment_field_name,:description)";
+        $query = "INSERT INTO {lab_migration_experiment} (proposal_id, directory_name, number, title,description) VALUES (:proposal_id, :directory_name, :number, :experiment_field_name,:description)";
         $args= array(
-            ":proposal_id" => $proposal_id, 
+            ":proposal_id" => $proposal_id,
+            ":directory_name" => $directory_name, 
             ":number" => $number, 
             ":experiment_field_name"=> trim($form_state['values'][$experiment_field_name]),
 	    ":description"=>trim($form_state['values'][$experiment_description])

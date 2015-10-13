@@ -45,7 +45,7 @@ function lab_migration_code_approval()
     }
 
     /* setting table row information */
-    $pending_solution_rows[] = array($proposal_data->lab_title, $experiment_data->title, $proposal_data->name, $solution_provider_user_name, l('Edit', 'lab_migration/code_approval/approve/' . $pending_solution_data->id));
+    $pending_solution_rows[] = array($proposal_data->lab_title, $experiment_data->title, $proposal_data->name, $solution_provider_user_name, l('Edit', 'lab-migration/code-approval/approve/' . $pending_solution_data->id));
   }
 
   /* check if there are any pending solutions */                                   
@@ -61,7 +61,7 @@ function lab_migration_code_approval()
   return $output; 
 }
 
-function lab_migration_code_approval_form($form_state)
+function lab_migration_code_approval_form($form,$form_state)
 {
   $solution_id = (int)arg(3);
 
@@ -75,7 +75,7 @@ function lab_migration_code_approval_form($form_state)
   if (!$solution_data)
   {
     drupal_set_message(t('Invalid solution selected.'), 'status');
-    drupal_goto('lab_migration/code_approval');
+    drupal_goto('lab-migration/code-approval');
   }
   if ($solution_data->approval_status == 1) {
   	 drupal_set_message(t('This solution has already been approved. Are you sure you want to change the approval status?'), 'error');
@@ -137,7 +137,7 @@ function lab_migration_code_approval_form($form_state)
 
   $form['back_to_list'] = array(
     '#type' => 'item',
-    '#markup' => l('Back to Code Approval List', 'lab_migration/code_approval'),
+    '#markup' => l('Back to Code Approval List', 'lab-migration/code-approval'),
   );
 
   $form['code_number'] = array(
@@ -171,7 +171,7 @@ function lab_migration_code_approval_form($form_state)
 			case 'U': $code_file_type = 'Unknown'; break;
 			default: $code_file_type = 'Unknown'; break;
 			}
-			$solution_files_html .= l($solution_files_data->filename, 'lab_migration/download/file/' . $solution_files_data->id) . ' (' . $code_file_type . ')' . '<br/>';
+			$solution_files_html .= l($solution_files_data->filename, 'lab-migration/download/file/' . $solution_files_data->id) . ' (' . $code_file_type . ')' . '<br/>';
 		}
 	}
 	/* get dependencies files */
@@ -190,7 +190,7 @@ $dependency_q = $query->execute();
     $dependency_files_q = $query->execute();
 		$dependency_files_data = $dependency_files_q->fetchObject();
 		$solution_file_type = 'Dependency file';
-		$solution_files_html .= l($dependency_files_data->filename, 'lab_migration/download/dependency/' . $dependency_files_data->id) . ' (' . 'Dependency' . ')' . '<br/>';
+		$solution_files_html .= l($dependency_files_data->filename, 'lab-migration/download/dependency/' . $dependency_files_data->id) . ' (' . 'Dependency' . ')' . '<br/>';
 	}
 
   $form['solution_files'] = array(
@@ -209,7 +209,13 @@ $dependency_q = $query->execute();
 	$form['message'] = array(
 		'#type' => 'textarea',
 		'#title' => t('Reason for dis-approval'),
-	);
+		'#attributes' =>array('placeholder' => t('Enter reason for dis-approval'), 'cols' => 50, 'rows' => 4),
+		'#states' => array(
+                  'visible' => array(
+                  ':input[name="approved"]' => array('value' => "2"),
+                     ),
+                  ),
+   );
 
   $form['submit'] = array(
     '#type' => 'submit',
@@ -218,12 +224,20 @@ $dependency_q = $query->execute();
 
   $form['cancel'] = array(
     '#type' => 'markup',
-    '#markup' => l(t('Cancel'), 'lab_migration/code_approval'),
+    '#markup' => l(t('Cancel'), 'lab-migration/code-approval'),
   );
 
   return $form;
 }
 
+function lab_migration_code_approval_form_validate($form, &$form_state)
+{
+      if($form_state['values']['approved']==2){
+         if($form_state['values']['message']==""){
+         form_set_error('message', t('Reason for dis-approval could not be empty'));
+         }
+     }
+}
 function lab_migration_code_approval_form_submit($form, &$form_state)
 {
   global $user;
@@ -240,7 +254,7 @@ function lab_migration_code_approval_form_submit($form, &$form_state)
   if (!$solution_data)
   {
     drupal_set_message(t('Invalid solution selected.'), 'status');
-    drupal_goto('lab_migration/code_approval');
+    drupal_goto('lab-migration/code-approval');
   }
 
 	/* get experiment data */
@@ -313,6 +327,6 @@ function lab_migration_code_approval_form_submit($form, &$form_state)
 	}
 
   drupal_set_message('Updated successfully.', 'status');
-  drupal_goto('lab_migration/code_approval');
+  drupal_goto('lab-migration/code-approval');
 }
 

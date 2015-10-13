@@ -90,19 +90,19 @@
 			$lab_default_value = $url_lab_id;
 		$form['selected_lab'] = array(
         '#type' => 'item',
-        '#markup' => '<div id="ajax_selected_lab">'.l('Download Lab Solutions', 'lab_migration/download/lab/' . $lab_default_value).'</div>',
+        '#markup' => '<div id="ajax_selected_lab">'.l('Download Lab Solutions', 'lab-migration/download/lab/' . $lab_default_value).'</div>',
       
       );
       $form['selected_lab_pdf'] = array(
         '#type' => 'item',
-        '#markup' => '<div id="ajax_selected_lab_pdf">'. l('Download PDF of Lab Solutions', 'lab_migration/generate_lab/' . $lab_default_value . '/1') .'</div>',
+        '#markup' => '<div id="ajax_selected_lab_pdf">'. l('Download PDF of Lab Solutions', 'lab-migration/generate-lab/' . $lab_default_value . '/1') .'</div>',
       
       );
 
 if($lab_default_value=='2'){
 $form['selected_lab_freeeda'] = array(
         '#type' => 'item',
-        '#markup' => '<div id="ajax_selected_lab_freeeda">'.l('Download Lab Solutions (FreeEDA Version)', 'lab_migration_uploads/Open_Source_EDA_Lab_FreeEDA_Version.zip').'</div>',
+        '#markup' => '<div id="ajax_selected_lab_freeeda">'.l('Download Lab Solutions (FreeEDA Version)', 'lab-migration-uploads/Open_Source_EDA_Lab_FreeEDA_Version.zip').'</div>',
       
       );
 }
@@ -183,10 +183,10 @@ function ajax_experiment_list_callback($form, $form_state) {
         	$user_solution_provider = user_load($lab_details->solution_provider_uid);
         	//var_dump($lab_details->solution_provider_uid);
     	if ($lab_details->solution_provider_uid > 0) { 
-    	 $commands[] = ajax_command_html('#ajax_selected_lab', l('Download Lab Solutions', 'lab_migration/download/lab/' . $lab_default_value));
+    	 $commands[] = ajax_command_html('#ajax_selected_lab', l('Download Lab Solutions', 'lab-migration/download/lab/' . $lab_default_value));
     if($lab_default_value=='2'){
- $commands[] = ajax_command_html('#ajax_selected_lab_freeeda', l('Download Lab Solutions (FreeEDA Version)', 'lab_migration_uploads/Open_Source_EDA_Lab_FreeEDA_Version.zip'));} 
-      $commands[] = ajax_command_html('#ajax_selected_lab_pdf', l('Download PDF of Lab Solutions', 'lab_migration/generate_lab/' . $lab_default_value . '/1'));         
+ $commands[] = ajax_command_html('#ajax_selected_lab_freeeda', l('Download Lab Solutions (FreeEDA Version)', 'lab-migration_uploads/Open_Source_EDA_Lab_FreeEDA_Version.zip'));} 
+      $commands[] = ajax_command_html('#ajax_selected_lab_pdf', l('Download PDF of Lab Solutions', 'lab-migration/generate-lab/' . $lab_default_value . '/1'));         
         
         }else{
          $commands[] = ajax_command_html('#ajax_selected_lab', '');      
@@ -233,7 +233,7 @@ function ajax_solution_list_callback($form, $form_state){
 		   
 		   $form['lab_solution_list']['#options'] = _ajax_get_solution_list($experiment_list_default_value);
 		   
-		   $commands[] = ajax_command_html('#ajax_download_experiments', l('Download Experiment', 'lab_migration/download/experiment/' . $experiment_list_default_value));
+		   $commands[] = ajax_command_html('#ajax_download_experiments', l('Download Experiment', 'lab-migration/download/experiment/' . $experiment_list_default_value));
       
       	$commands[] = ajax_command_html('#ajax_selected_experiment',drupal_render($form['lab_experiment_list']));
       
@@ -285,7 +285,7 @@ function ajax_solution_list_callback($form, $form_state){
           case 'X' : $solution_file_type = 'xcos file'; break;
           default  : $solution_file_type = 'Unknown'; break;
           }
-          $solution_files_rows[] = array(l($solution_list_data->filename, 'lab_migration/download/file/' . $solution_list_data->id), $solution_file_type);
+          $solution_files_rows[] = array(l($solution_list_data->filename, 'lab-migration/download/file/' . $solution_list_data->id), $solution_file_type);
         }
 
         /* dependency files */
@@ -303,7 +303,7 @@ function ajax_solution_list_callback($form, $form_state){
 				   $dependency_files_q = $query->execute();
 					$dependency_files_data = $dependency_files_q->fetchObject();
 					$solution_file_type = 'Dependency file';
-					$solution_files_rows[] = array(l($dependency_files_data->filename, 'lab_migration/download/dependency/' . $dependency_files_data->id), $solution_file_type);
+					$solution_files_rows[] = array(l($dependency_files_data->filename, 'lab-migration/download/dependency/' . $dependency_files_data->id), $solution_file_type);
 				}
 
         /* creating list of files table */
@@ -313,7 +313,7 @@ function ajax_solution_list_callback($form, $form_state){
       }
 		 $form['solution_files']['#title'] = 'List of solution files';
 		 $form['solution_files']['#markup'] = $solution_files;
-       $commands[] = ajax_command_html('#ajax_download_experiment_solution', l('Download Solution', 'lab_migration/download/solution/' . $solution_list_default_value));
+       $commands[] = ajax_command_html('#ajax_download_experiment_solution', l('Download Solution', 'lab-migration/download/solution/' . $solution_list_default_value));
     //   $commands[] = ajax_command_html('#ajax_edit_experiment_solution', l('Edit Solution', 'code_approval/editcode/' . $solution_list_default_value));
       // $commands[] = ajax_command_html('#ajax_solution_files', $solution_files);
        $commands[] = ajax_command_html('#ajax_solution_files',drupal_render($form['solution_files']));
@@ -450,7 +450,7 @@ $form['lab_details']['#markup']= '<span style="color: rgb(128, 0, 0);"><strong>A
         '<li><strong>Title of the Lab:</strong> ' . $lab_details->lab_title . '</li>' .
         '<li><strong>Department:</strong> ' . $lab_details->department . '</li>' .
         '<li><strong>University:</strong> ' . $lab_details->university . '</li>' .
-        '<li><strong>Category:</strong> ' .  $category_data . '</li>' .
+        '<li><strong>Category:</strong> ' .  $lab_details->category . '</li>' .
         '</ul>' .
         $solution_provider;
         

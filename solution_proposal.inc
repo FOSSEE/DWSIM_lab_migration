@@ -15,7 +15,7 @@ function lab_migration_proposal_open()
             $proposal_q = $query->execute();
   while ($proposal_data = $proposal_q->fetchObject())
   {
-    $proposal_rows[] = array(l($proposal_data->lab_title, 'lab_migration/show_proposal/' . $proposal_data->id), l('Apply', 'lab_migration/show_proposal/' . $proposal_data->id));
+    $proposal_rows[] = array(l($proposal_data->lab_title, 'lab-migration/show-proposal/' . $proposal_data->id), l('Apply', 'lab-migration/show-proposal/' . $proposal_data->id));
   }
 
   $proposal_header = array('Title of the Lab', 'Actions');
@@ -139,7 +139,7 @@ function lab_migration_solution_proposal_form_validate($form_state, &$form_state
             $solution_provider_q = $query->execute();
 	if ($solution_provider_q->fetchObject()) {
     form_set_error('', t("You have already applied for a solution. Please compelete that before applying for another solution."));
-    drupal_goto('lab_migration/open_proposal');
+    drupal_goto('lab-migration/open-proposal');
 	}
 }
 
@@ -158,11 +158,11 @@ function lab_migration_solution_proposal_form_submit($form_state, &$form_state)
   if (!$proposal_data)
   {
     drupal_set_message("Invalid proposal.", 'error');
-    drupal_goto('lab_migration/open_proposal');
+    drupal_goto('lab-migration/open-proposal');
   }
   if ($proposal_data->solution_provider_uid != 0) {
     drupal_set_message("Someone has already applied for solving this Lab.", 'error');
-    drupal_goto('lab_migration/open_proposal');
+    drupal_goto('lab-migration/open-proposal');
   }
 
   $query = "UPDATE {lab_migration_proposal} set solution_provider_uid = :uid, solution_status = 1, solution_provider_name_title = :solution_provider_name_title, solution_provider_name = :solution_provider_contact_name, solution_provider_contact_ph = :solution_provider_contact_ph, solution_provider_department = :solution_provider_department, solution_provider_university = :solution_provider_university WHERE id = :proposal_id";
@@ -190,6 +190,6 @@ function lab_migration_solution_proposal_form_submit($form_state, &$form_state)
   if (!drupal_mail('lab_migration', 'solution_proposal_received', $email_to , language_default(), $param, variable_get('lab_migration_from_email', NULL), TRUE))
     drupal_set_message('Error sending email message.', 'error');
 
-	drupal_goto('lab_migration/open_proposal');
+	drupal_goto('lab-migration/open-proposal');
 }
 

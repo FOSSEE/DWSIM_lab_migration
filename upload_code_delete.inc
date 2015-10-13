@@ -22,13 +22,13 @@ function lab_migration_upload_code_delete()
   if (!$solution_data)
   {
     drupal_set_message('Invalid solution.', 'error');
-    drupal_goto('lab_migration/code');
+    drupal_goto('lab-migration/code');
     return;
   }
   if ($solution_data->approval_status != 0)
   {
     drupal_set_message('You cannnot delete a solution after it has been approved. Please contact site administrator if you want to delete this solution.', 'error');
-    drupal_goto('lab_migration/code');
+    drupal_goto('lab-migration/code');
     return;
   }
 
@@ -43,7 +43,7 @@ function lab_migration_upload_code_delete()
   if (!$experiment_data)
   {
     drupal_set_message('You do not have permission to delete this solution.', 'error');
-    drupal_goto('lab_migration/code');
+    drupal_goto('lab-migration/code');
     return;
   }
 
@@ -58,7 +58,7 @@ function lab_migration_upload_code_delete()
   if (!$proposal_data)
   {
     drupal_set_message('You do not have permission to delete this solution.', 'error');
-    drupal_goto('lab_migration/code');
+    drupal_goto('lab-migration/code');
     return;
   }
 
@@ -81,7 +81,7 @@ function lab_migration_upload_code_delete()
     drupal_set_message('Error deleting example.', 'status');
   }
 
-  drupal_goto('lab_migration/code');
+  drupal_goto('lab-migration/code');
   return;
 }
 

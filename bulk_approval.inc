@@ -131,11 +131,9 @@ $select_two = isset($form_state['values']['lab_experiment_list']) ? $form_state[
 
       
       
-      $commands[] = ajax_command_html('#ajax_selected_lab', l('Download', 'lab_migration/full_download/lab/' . $lab_default_value) . ' ' . 
-            t('(Download all the approved and unapproved solutions of the entire lab)') );
+      $commands[] = ajax_command_html('#ajax_selected_lab', l('Download', 'lab-migration/full-download/lab/' . $lab_default_value) . ' ' . t('(Download all the approved and unapproved solutions of the entire lab)') );
       
-      /*$commands[] = ajax_command_html('#ajax_selected_lab_pdf', l('Download PDF', 'lab_migration/generate_lab/' . $lab_default_value . '/1') . 
-      ' ' . t('(Download PDF of all the approved and unapproved solution of the entire lab)'));  */
+      /*$commands[] = ajax_command_html('#ajax_selected_lab_pdf', l('Download PDF', 'lab-migration/generate-lab/' .$lab_default_value . '/1') . ' ' . t('(Download PDF of all the approved and unapproved solution of the entire lab)'));  */
       
       $form['lab_actions']['#options'] = _bulk_list_lab_actions();
       $form['lab_experiment_list']['#options'] = _ajax_bulk_get_experiment_list($lab_default_value);
@@ -180,7 +178,7 @@ $select_two = isset($form_state['values']['lab_experiment_list']) ? $form_state[
        $form['lab_experiment_actions']['#options'] =_bulk_list_experiment_actions();
        $form['lab_solution_list']['#options'] = _ajax_bulk_get_solution_list($experiment_list_default_value);
       
-      $commands[] = ajax_command_html('#ajax_download_experiment', l('Download Experiment', 'lab_migration/download/experiment/' . $experiment_list_default_value));
+      $commands[] = ajax_command_html('#ajax_download_experiment', l('Download Experiment', 'lab-migration/download/experiment/' . $experiment_list_default_value));
      
       
      $commands[] = ajax_command_data('#ajax_selected_experiment', 'form_state_value_select', $form_state['values']['lab_experiment_list']);
@@ -238,7 +236,7 @@ function ajax_bulk_solution_files_callback($form, $form_state) {
           case 'X' : $solution_file_type = 'xcos file'; break;
           default  : $solution_file_type = 'Unknown'; break;
           }
-          $solution_files_rows[] = array(l($solution_list_data->filename, 'lab_migration/download/file/' . $solution_list_data->id), $solution_file_type);
+          $solution_files_rows[] = array(l($solution_list_data->filename, 'lab-migration/download/file/' . $solution_list_data->id), $solution_file_type);
         }
 
         /* dependency files */
@@ -256,7 +254,7 @@ function ajax_bulk_solution_files_callback($form, $form_state) {
 				   $dependency_files_q = $query->execute();
 					$dependency_files_data = $dependency_files_q->fetchObject();
 					$solution_file_type = 'Dependency file';
-					$solution_files_rows[] = array(l($dependency_files_data->filename, 'lab_migration/download/dependency/' . $dependency_files_data->dependency_id), $solution_file_type);
+					$solution_files_rows[] = array(l($dependency_files_data->filename, 'lab-migration/download/dependency/' . $dependency_files_data->dependency_id), $solution_file_type);
 				}
 
         /* creating list of files table */
@@ -266,8 +264,8 @@ function ajax_bulk_solution_files_callback($form, $form_state) {
       }
 		 $form['solution_files']['#title'] = 'List of solution files';
 		 $form['solution_files']['#markup'] = $solution_files;
-       $commands[] = ajax_command_html('#ajax_download_experiment_solution', l('Download Solution', 'lab_migration/download/solution/' . $solution_list_default_value));
-       $commands[] = ajax_command_html('#ajax_edit_experiment_solution', l('Edit Solution', 'code_approval/editcode/' . $solution_list_default_value));
+       $commands[] = ajax_command_html('#ajax_download_experiment_solution', l('Download Solution', 'lab-migration/download/solution/' . $solution_list_default_value));
+       $commands[] = ajax_command_html('#ajax_edit_experiment_solution', l('Edit Solution', 'code-approval/editcode/' . $solution_list_default_value));
       // $commands[] = ajax_command_html('#ajax_solution_files', $solution_files);
        $commands[] = ajax_command_html('#ajax_solution_files',drupal_render($form['solution_files']));
        
@@ -535,6 +533,7 @@ function _bulk_list_of_labs()
   //$lab_titles_q = db_query("SELECT * FROM {lab_migration_proposal} WHERE solution_display = 1 ORDER BY lab_title ASC");
   $query = db_select('lab_migration_proposal');
               $query->fields('lab_migration_proposal');
+              $query->condition('approval_status', 2, '<>');
               $query->condition('solution_display', 1);
               $query->orderBy('lab_title', 'ASC');
               $lab_titles_q = $query->execute();

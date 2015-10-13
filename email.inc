@@ -34,9 +34,9 @@ function lab_migration_mail($key, &$message, $params)
                $query->orderBy('number', 'ASC');
                $experiment_q = $query->execute();
       $experiment_list = '
-      	';
+         ';
       while ($experiment_data = $experiment_q->fetchObject()) {
-      	$experiment_list .= $experiment_data->number . ' ' . $experiment_data->title . '<br/> '.$experiment_data->description.' ';
+         $experiment_list .= '<br>' . $experiment_data->number . ' ' . $experiment_data->title . '<br> '.$experiment_data->description.' <br>';
       }
 
       $user_data = user_load($params['solution_proposal_approved']['user_id']);
@@ -57,7 +57,7 @@ Display solution on website : ' . $solution_display . '
 
 List of experiments : ' . $experiment_list . '
 
-Please ensure that ALL the codes follow guidelines at http://www.esim.fossee.in/coding-guidelines-lab-migration
+Please ensure that ALL the codes follow guidelines at http://www.dwsim.fossee.in/coding-guidelines-lab-migration
 
 Best Wishes,
 
@@ -118,7 +118,7 @@ Best Wishes,
       $experiment_list = '
       	';
       while ($experiment_data = $experiment_q->fetchObject()) {
-      	$experiment_list .= $experiment_data->number . ' ' . $experiment_data->title . '<br/> '.$experiment_data->description.' ';
+         $experiment_list .= '<br>' . $experiment_data->number . ' ' . $experiment_data->title . '<br> '.$experiment_data->description.' <br>';
       }
 
       $user_data = user_load($params['proposal_received']['user_id']);
@@ -136,15 +136,13 @@ Contact No. : ' . $proposal_data->contact_ph . '
 Department/Branch : ' . $proposal_data->department . '
 University/Institute : ' . $proposal_data->university . '
 
-Display solution on website : ' . $solution_display . '
-
 Solution Provided By : ' . $solution_provider_user . '
 
 List of experiments : ' . $experiment_list . '
 
 Your proposal is under review and you will soon receive an email from us regarding the same.
 
-Please ensure that ALL the codes follow guidelines at http://www.esim.fossee.in/coding-guidelines-lab-migration
+Please ensure that ALL the codes follow guidelines at http://www.dwsim.fossee.in/coding-guidelines-lab-migration
 
 Best Wishes,
 
@@ -187,7 +185,7 @@ Best Wishes,
       $experiment_list = '
       	';
       while ($experiment_data = $experiment_q->fetchObject()) {
-      	$experiment_list .= $experiment_data->number . ' ' . $experiment_data->title . '<br/> '.$experiment_data->description.' ';
+         $experiment_list .= '<br>' . $experiment_data->number . ' ' . $experiment_data->title . '<br> '.$experiment_data->description.' <br>';
       }
 
       $user_data = user_load($params['proposal_disapproved']['user_id']);
@@ -206,13 +204,11 @@ Contact No. : ' . $proposal_data->contact_ph . '
 Department/Branch : ' . $proposal_data->department . '
 University/Institute : ' . $proposal_data->university . '
 
-Display solution on website : ' . $solution_display . '
-
 Solution Provided By : ' . $solution_provider_user . '
 
 List of experiments : ' . $experiment_list . '
 
-Please ensure that ALL the codes follow guidelines at http://www.esim.fossee.in/coding-guidelines-lab-migration
+Please ensure that ALL the codes follow guidelines at http://www.dsim.fossee.in/coding-guidelines-lab-migration
 
 Best Wishes,
 
@@ -255,7 +251,7 @@ Best Wishes,
       $experiment_list = '
       	';
       while ($experiment_data = $experiment_q->fetchObject()) {
-      	$experiment_list .= $experiment_data->number . ' ' . $experiment_data->title . '<br/> '.$experiment_data->description.' ';
+      	$experiment_list .= '<br>' . $experiment_data->number . ' ' . $experiment_data->title . '<br> '.$experiment_data->description.' <br>';
       }
 
       $user_data = user_load($params['proposal_approved']['user_id']);
@@ -272,13 +268,11 @@ Contact No. : ' . $proposal_data->contact_ph . '
 Department/Branch : ' . $proposal_data->department . '
 University/Institute : ' . $proposal_data->university . '
 
-Display solution on website : ' . $solution_display . '
-
 Solution Provided By : ' . $solution_provider_user . '
 
 List of experiments : ' . $experiment_list . '
 
-Please ensure that ALL the codes follow guidelines at http://www.esim.fossee.in/coding-guidelines-lab-migration
+Please ensure that ALL the codes follow guidelines at http://www.dwsim.fossee.in/coding-guidelines-lab-migration
 
 Best Wishes,
 
@@ -322,7 +316,7 @@ Best Wishes,
       $experiment_list = '
       	';
       while ($experiment_data = $experiment_q->fetchObject()) {
-      	$experiment_list .= $experiment_data->number . ' ' . $experiment_data->title . '<br/> '.$experiment_data->description.' ';
+      	$experiment_list .= '<br/><br/><span style="font-weight: bold;">'. $experiment_data->number . ' ' . $experiment_data->title . '</span><br/><br/> '.'Description:'. $experiment_data->description.'<br/><br/>';
       }
 
       $user_data = user_load($params['proposal_completed']['user_id']);
@@ -339,19 +333,17 @@ Contact No. : ' . $proposal_data->contact_ph . '
 Department/Branch : ' . $proposal_data->department . '
 University/Institute : ' . $proposal_data->university . '
 
-Display solution on website : ' . $solution_display . '
-
 Solution Provided By : ' . $solution_provider_user . '
 
 List of experiments : ' . $experiment_list . '
 
 Your Lab solution is now available at following link to download.
 
-http://esim.fossee.in/lab_migration_run/' . $proposal_data->id . '
+http://dwsim.fossee.in/lab_migration_run/' . $proposal_data->id . '
 
 Now you should be able to propose a new Lab migration...
 
-Please ensure that ALL the codes follow guidelines at http://www.esim.fossee.in/coding-guidelines-lab-migration
+Please ensure that ALL the codes follow guidelines at http://www.dwsim.fossee.in/coding-guidelines-lab-migration
 
 Best Wishes,
 
@@ -384,7 +376,7 @@ Best Wishes,
       $experiment_list = '
       	';
       while ($experiment_data = $experiment_q->fetchObject()) {
-      	$experiment_list .= $experiment_data->number . ' ' . $experiment_data->title . '<br/> Description: '.$experiment_data->description.'<br/><br/> ';
+         $experiment_list .= '<br/><b>' . $experiment_data->number . ' ' . $experiment_data->title . '</b><br/> Description: '.$experiment_data->description.'<br/><br/><br/> ';
       }
 
       $user_data = user_load($params['solution_proposal_received']['user_id']);
@@ -409,7 +401,7 @@ List of experiments : ' . $experiment_list . '
 
 Your proposal is under review and you will soon receive an email from us regarding the same.
 
-Please ensure that ALL the codes follow guidelines at http://www.esim.fossee.in/coding-guidelines-lab-migration
+Please ensure that ALL the codes follow guidelines at http://www.dwsim.fossee.in/coding-guidelines-lab-migration
 
 Best Wishes,
 
@@ -418,20 +410,30 @@ Best Wishes,
 
     case 'solution_uploaded':
      // $solution_q = db_query("SELECT * FROM {lab_migration_solution} WHERE id = %d LIMIT 1", $params['solution_uploaded']['solution_id']);
-      $query = db_select('lab_migration_solution');
+      /*$query = db_select('lab_migration_solution');
       $query->fields('lab_migration_solution');
       $query->condition('id', $params['solution_uploaded']['solution_id']);
       $query->range(0, 1);
       $solution_q = $query->execute();
+      $solution_data = $solution_q->fetchObject();*/
+      
+      $query = "SELECT lms.* , lmp.lab_title FROM lab_migration_solution lms 
+               INNER JOIN lab_migration_experiment lme ON lme.id = lms.experiment_id
+               JOIN lab_migration_proposal lmp ON lme.proposal_id = lmp.id 
+               WHERE lms.id = :id";
+               
+      $solution_q = db_query($query, array(":id" => $params['solution_uploaded']['solution_id']));
       $solution_data = $solution_q->fetchObject();
+      
       $user_data = user_load($params['solution_uploaded']['user_id']);
 
       $message['subject'] = t('[!site_name] You have uploaded solution', array('!site_name' => variable_get('site_name', '')), array('language' => $language->language));
       $message['body'] = array('body' => t('
 Dear !user_name,
 
-You have uploaded the following solution:
+You have uploaded the following solution: 
 
+Lab title: ' . $solution_data->lab_title . '
 Example number : ' . $solution_data->code_number . '
 Caption : ' .  $solution_data->caption . '
 
@@ -462,7 +464,7 @@ Your following solution has been approved:
 Solution number : ' . $solution_data->code_number . '
 Caption : ' .  $solution_data->caption . '
 
-Please ensure that ALL the codes follow guidelines at http://www.esim.fossee.in/coding-guidelines-lab-migration
+Please ensure that ALL the codes follow guidelines at http://www.dwsim.fossee.in/coding-guidelines-lab-migration
 
 Best Wishes,
 
@@ -483,7 +485,7 @@ Caption : ' . $params['solution_disapproved']['solution_caption'] . '
 
 Reason for dis-approval : ' . $params['solution_disapproved']['message'] . '
 
-Please ensure that ALL the codes follow guidelines at http://www.esim.fossee.in/coding-guidelines-lab-migration
+Please ensure that ALL the codes follow guidelines at http://www.dwsim.fossee.in/coding-guidelines-lab-migration
 
 Best Wishes,
 
@@ -491,8 +493,7 @@ Best Wishes,
       break;
 
     case 'solution_deleted_user':
-      $user_data = user_load($params['solution_deleted_user']['user_id']);
-
+      $user_data = user_load($params['example_deleted_user']['user_id']);   
       $message['subject'] = t('[!site_name] User has deleted pending solution', array('!site_name' => variable_get('site_name', '')), array('language' => $language->language));
       $message['body'] = array('body' => t('
 Dear !user_name,
@@ -504,7 +505,7 @@ Title of the Experiment : ' . $params['solution_deleted_user']['experiment_title
 Solution number : ' . $params['solution_deleted_user']['solution_number'] . '
 Caption : ' . $params['solution_deleted_user']['solution_caption'] . '
 
-Please ensure that ALL the codes follow guidelines at http://www.esim.fossee.in/coding-guidelines-lab-migration
+Please ensure that ALL the codes follow guidelines at http://www.dwsim.fossee.in/coding-guidelines-lab-migration
 
 Best Wishes,
 
@@ -513,6 +514,7 @@ Best Wishes,
 
     case 'dependency_uploaded':
       $user_data = user_load($params['dependency_uploaded']['user_id']);
+   
       $dependency_files = implode(',', $params['dependency_uploaded']['dependency_names']);
 
       $message['subject'] = t('[!site_name] You have uploaded dependency file', array('!site_name' => variable_get('site_name', '')), array('language' => $language->language));
@@ -522,7 +524,7 @@ Dear !user_name,
 You have uploaded following dependency files :
     ' . $dependency_files . '
 
-Please ensure that ALL the codes follow guidelines at http://www.esim.fossee.in/coding-guidelines-lab-migration
+Please ensure that ALL the codes follow guidelines at http://www.dwsim.fossee.in/coding-guidelines-lab-migration
 
 Best Wishes,
 

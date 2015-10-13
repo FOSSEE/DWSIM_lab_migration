@@ -7,11 +7,11 @@
         $query->condition('approval_status', 3);
         $result = $query->execute();
         //$result = db_query($query);
-        $proposal_rows = array();
+        $preference_rows = array();
         $i=1;
             while($row = $result->fetchObject()) {
-                $approval_date=date("Y", $row->approval_date);
-                $preference_rows[] = array($i, $row->university , l($row->lab_title,"lab_migration_run/".$row->id),$approval_date);
+                $approval_date = date("Y", $row->approval_date);
+                $preference_rows[] = array($i, $row->university , l($row->lab_title,"lab-migration-run/".$row->id),$approval_date);
                 $i++;
             }
         $preference_header = array('No','Institute', 'Lab', 'Year');
@@ -37,4 +37,7 @@
         $page_content .= "</ol>";
         return $page_content;
     }
+    
+    
+
 ?>

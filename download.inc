@@ -244,7 +244,7 @@ function lab_migration_download_lab()
                   $solution_dependency_files_q = $query->execute();
       while ($solution_files_row = $solution_files_q->fetchObject())
       {
-        $zip->addFile($root_path . $solution_files_row->filepath, $LAB_PATH . $EXP_PATH . $CODE_PATH . str_replace(' ','_',($solution_files_row->filename)));
+        $zip->addFile($root_path . $solution_files_row->filepath, $EXP_PATH . $CODE_PATH . str_replace(' ','_',($solution_files_row->filename)));
        //var_dump($zip->numFiles);
       }
       
@@ -259,7 +259,7 @@ function lab_migration_download_lab()
                   $query->range(0, 1);
                   $dependency_file_data = $query->execute()->fetchObject();
         if ($dependency_file_data)
-          $zip->addFile($root_path . $dependency_file_data->filepath, $LAB_PATH . $EXP_PATH . $CODE_PATH . 'DEPENDENCIES/' . str_replace(' ','_',($dependency_file_data->filename)));
+          $zip->addFile($root_path . $dependency_file_data->filepath,  $EXP_PATH . $CODE_PATH . 'DEPENDENCIES/' . str_replace(' ','_',($dependency_file_data->filename)));
       }
     }
   }
