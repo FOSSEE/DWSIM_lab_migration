@@ -511,6 +511,16 @@ function lab_migration_bulk_approval_form_submit($form, $form_state)
             elseif (($form_state['values']['lab_actions'] == 4) && ($form_state['values']['lab_experiment_actions'] == 0) && ($form_state['values']['lab_experiment_solution_actions'] == 0))
               {
 
+              if (!$form_state['values']['message'])
+                  {
+                    if (strlen(trim($form_state['values']['message'])) <= 30)
+                      {
+                        form_set_error('message', t(''));
+                        drupal_set_message("Please mention the reason for disapproval.", 'error');
+                        return;
+                      }
+                  }
+
                 if (!user_access('lab migration bulk delete code'))
                   {
                     drupal_set_message(t('You do not have permission to Bulk Delete Entire Lab Including Proposal.'), 'error');
@@ -606,8 +616,18 @@ function lab_migration_bulk_approval_form_submit($form, $form_state)
                 );
 
               }
-            elseif (($form_state['values']['lab_actions'] == 1) && ($form_state['values']['lab_experiment_actions'] == 3) && ($form_state['values']['lab_experiment_solution_actions'] == 0))
+            elseif (($form_state['values']['lab_actions'] == 0) && ($form_state['values']['lab_experiment_actions'] == 3) && ($form_state['values']['lab_experiment_solution_actions'] == 0))
               {
+
+              if (!$form_state['values']['message'])
+                  {
+                    if (strlen(trim($form_state['values']['message'])) <= 30)
+                      {
+                        form_set_error('message', t(''));
+                        drupal_set_message("Please mention the reason for disapproval.", 'error');
+                        return;
+                      }
+                  }
 
                 if (!user_access('lab migration bulk delete code'))
                   {
@@ -668,6 +688,15 @@ function lab_migration_bulk_approval_form_submit($form, $form_state)
               }
             elseif (($form_state['values']['lab_actions'] == 0) && ($form_state['values']['lab_experiment_actions'] == 0) && ($form_state['values']['lab_experiment_solution_actions'] == 3))
               {
+              if (!$form_state['values']['message'])
+                  {
+                    if (strlen(trim($form_state['values']['message'])) <= 30)
+                      {
+                        form_set_error('message', t(''));
+                        drupal_set_message("Please mention the reason for disapproval.", 'error');
+                        return;
+                      }
+                  }
 
                 if (lab_migration_delete_solution($form_state['values']['lab_solution_list']))
                   {
@@ -692,7 +721,7 @@ function lab_migration_bulk_approval_form_submit($form, $form_state)
             else
               {
 
-                drupal_set_message("Please select any one action", 'error');
+                drupal_set_message("Please select any one action at a time", 'error');
                 return;
 
               }
