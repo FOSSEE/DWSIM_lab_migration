@@ -371,10 +371,8 @@ function lab_migration_bulk_approval_form_submit($form, $form_state)
                 }
                 drupal_set_message(t('Approved Entire Lab.'), 'status');
                 /* email */
-                $email_subject = t('[!site_name] Your uploaded solutions have been approved', array(
+                $email_subject = t('[!site_name - Lab Migration Project] Your uploaded solutions have been approved', array(
                     '!site_name' => variable_get('site_name', '')
-                ), array(
-                    'language' => $language->language
                 ));
                 $email_body = array(
                     0 => t('Your all the uploaded solutions for the Lab have been approved.')
@@ -393,7 +391,9 @@ function lab_migration_bulk_approval_form_submit($form, $form_state)
                 }
                 drupal_set_message(t('Pending Review Entire Lab.'), 'status');
                 /* email */
-                $email_subject = t('Your uploaded solutions have been marked as pending');
+                $email_subject = t('[!site_name - Lab Migration Project] Your uploaded solutions have been marked as pending', array(
+                    '!site_name' => variable_get('site_name', '')
+                ));
                 $email_body = array(
                     0 => t('Your all the uploaded solutions for the Lab have been marked as pending to be review. You will be able to see the solutions after they have been approved by one of our reviewers.')
                 );
@@ -415,10 +415,8 @@ function lab_migration_bulk_approval_form_submit($form, $form_state)
                     drupal_set_message(t('Error Dis-Approving and Deleting Entire Lab.'), 'error');
                 }
                 /* email */
-                $email_subject = t('[!site_name] Your uploaded solutions have been marked as dis-approved', array(
+                $email_subject = t('[!site_name - Lab Migration Project] Your uploaded solutions have been marked as dis-approved', array(
                     '!site_name' => variable_get('site_name', '')
-                ), array(
-                    'language' => $language->language
                 ));
                 $email_body = array(
                     0 => t('Your all the uploaded solutions for the whole Lab have been marked as dis-approved.
@@ -474,10 +472,8 @@ function lab_migration_bulk_approval_form_submit($form, $form_state)
                     ));
                     drupal_set_message(t('Deleted Lab Proposal.'), 'status');
                     /* email */
-                    $email_subject = t('[!site_name] Your uploaded solutions including the Lab proposal have been deleted', array(
+                    $email_subject = t('[!site_name - Lab Migration Project] Your uploaded solutions including the Lab proposal have been deleted', array(
                         '!site_name' => variable_get('site_name', '')
-                    ), array(
-                        'language' => $language->language
                     ));
                     $email_body = array(
                         0 => t('Your all the uploaded solutions including the Lab proposal have been deleted permanently.')
@@ -492,10 +488,8 @@ function lab_migration_bulk_approval_form_submit($form, $form_state)
                 ));
                 drupal_set_message(t('Approved Entire Experiment.'), 'status');
                 /* email */
-                $email_subject = t('[!site_name] Your uploaded solutions have been approved', array(
+                $email_subject = t('[!site_name - Lab Migration Project] Your uploaded solutions have been approved', array(
                     '!site_name' => variable_get('site_name', '')
-                ), array(
-                    'language' => $language->language
                 ));
                 $email_body = array(
                     0 => t('Your all the uploaded solutions for the experiment have been approved.')
@@ -506,10 +500,8 @@ function lab_migration_bulk_approval_form_submit($form, $form_state)
                 ));
                 drupal_set_message(t('Entire Experiment marked as Pending Review.'), 'status');
                 /* email */
-                $email_subject = t('[!site_name] Your uploaded solutions have been marked as pending', array(
+                $email_subject = t('[!site_name - Lab Migration Project] Your uploaded solutions have been marked as pending', array(
                     '!site_name' => variable_get('site_name', '')
-                ), array(
-                    'language' => $language->language
                 ));
                 $email_body = array(
                     0 => t('Your all the uploaded solutions for the experiment have been marked as pending to be review.')
@@ -532,7 +524,9 @@ function lab_migration_bulk_approval_form_submit($form, $form_state)
                     drupal_set_message(t('Error Dis-Approving and Deleting Entire Experiment.'), 'error');
                 }
                 /* email */
-                $email_subject = t('Your uploaded solutions have been marked as dis-approved');
+                $email_subject = t('[!site_name - Lab Migration Project] Your uploaded solutions have been marked as dis-approved', array(
+                    '!site_name' => variable_get('site_name', '')
+                ));
                 $email_body = array(
                     0 => t('Your uploaded solutions for the entire experiment have been marked as dis-approved.
 
@@ -547,7 +541,9 @@ function lab_migration_bulk_approval_form_submit($form, $form_state)
                 ));
                 drupal_set_message(t('Solution approved.'), 'status');
                 /* email */
-                $email_subject = t('Your uploaded solution has been approved');
+                $email_subject = t('[!site_name Lab Migration Project] Your uploaded solution has been approved', array(
+                    '!site_name' => variable_get('site_name', '')
+                ));
                 $email_body = array(
                     0 => t('Your uploaded solution has been approved.')
                 );
@@ -557,10 +553,8 @@ function lab_migration_bulk_approval_form_submit($form, $form_state)
                 ));
                 drupal_set_message(t('Solution marked as Pending Review.'), 'status');
                 /* email */
-                $email_subject = t('[!site_name] Your uploaded solution has been marked as pending', array(
+                $email_subject = t('[!site_name - Lab Migration Project] Your uploaded solution has been marked as pending', array(
                     '!site_name' => variable_get('site_name', '')
-                ), array(
-                    'language' => $language->language
                 ));
                 $email_body = array(
                     0 => t('Your uploaded solution has been marked as pending to be review.')
@@ -579,10 +573,8 @@ function lab_migration_bulk_approval_form_submit($form, $form_state)
                     drupal_set_message(t('Error Dis-Approving and Deleting Solution.'), 'error');
                 }
                 /* email */
-                $email_subject = t('[!site_name] Your uploaded solution has been marked as dis-approved', array(
+                $email_subject = t('[!site_name - Lab Migration Project] Your uploaded solution has been marked as dis-approved', array(
                     '!site_name' => variable_get('site_name', '')
-                ), array(
-                    'language' => $language->language
                 ));
                 $email_body = array(
                     0 => t('Your uploaded solution has been marked as dis-approved.
@@ -597,9 +589,9 @@ function lab_migration_bulk_approval_form_submit($form, $form_state)
             }
             /****** sending email when everything done ******/
             if (isset($email_subject)) {
-                /*$email_to = variable_get('lab_migration_emails', '') . ', ' . $user->mail; */
+                $email_to = variable_get('lab_migration_emails', '') . ', ' . $user->mail; 
                 // $email_to = "contact@scilab.in" . ', ' . $user->mail;
-                $email_to = "prashantsinalkar@gmail.com";
+                //$email_to = "prashantsinalkar@gmail.com";
                 $param['standard']['subject'] = $email_subject;
                 $param['standard']['body'] = $email_body;
                 if (!drupal_mail('lab_migration', 'standard', $email_to, language_default(), $param, variable_get('lab_migration_from_email', NULL), TRUE))
