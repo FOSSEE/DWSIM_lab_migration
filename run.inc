@@ -31,9 +31,9 @@
 			'#type' => 'item',
 			'#markup' => '<div id="ajax_selected_lab"></div>',
 		);
-		$form['selected_lab_freeeda'] = array(
+		$form['selected_lab_dwsim'] = array(
 			'#type' => 'item',
-			'#markup' => '<div id="ajax_selected_lab_freeeda"></div>',
+			'#markup' => '<div id="ajax_selected_lab_dwsim"></div>',
 		);
 		$form['selected_lab_pdf'] = array(
 			'#type' => 'item',
@@ -93,17 +93,17 @@
         '#markup' => '<div id="ajax_selected_lab">'.l('Download Lab Solutions', 'lab-migration/download/lab/' . $lab_default_value).'</div>',
       
       );
-      $form['selected_lab_pdf'] = array(
+     /* $form['selected_lab_pdf'] = array(
         '#type' => 'item',
         '#markup' => '<div id="ajax_selected_lab_pdf">'. l('Download PDF of Lab Solutions', 'lab-migration/generate-lab/' . $lab_default_value . '/1') .'</div>',
-      
-      );
+
+      );*/
 
 if($lab_default_value=='2'){
-$form['selected_lab_freeeda'] = array(
+$form['selected_lab_dwsim'] = array(
         '#type' => 'item',
-        '#markup' => '<div id="ajax_selected_lab_freeeda">'.l('Download Lab Solutions (FreeEDA Version)', 'lab-migration-uploads/Open_Source_EDA_Lab_FreeEDA_Version.zip').'</div>',
-      
+        '#markup' => '<div id="ajax_selected_lab_dwsim">'.l('Download Lab Solutions (dwsim Version)', 'lab-migration-uploads/dwsim_Version.zip').'</div>',
+
       );
 }
       $form['lab_details'] = array(
@@ -185,13 +185,13 @@ function ajax_experiment_list_callback($form, $form_state) {
     	if ($lab_details->solution_provider_uid > 0) { 
     	 $commands[] = ajax_command_html('#ajax_selected_lab', l('Download Lab Solutions', 'lab-migration/download/lab/' . $lab_default_value));
     if($lab_default_value=='2'){
- $commands[] = ajax_command_html('#ajax_selected_lab_freeeda', l('Download Lab Solutions (FreeEDA Version)', 'lab-migration_uploads/Open_Source_EDA_Lab_FreeEDA_Version.zip'));} 
-      $commands[] = ajax_command_html('#ajax_selected_lab_pdf', l('Download PDF of Lab Solutions', 'lab-migration/generate-lab/' . $lab_default_value . '/1'));         
+ $commands[] = ajax_command_html('#ajax_selected_lab_dwsim', l('Download Lab Solutions (dwsim Version)', 'lab-migration_uploads/dwsim_Version.zip'));} 
+     /* $commands[] = ajax_command_html('#ajax_selected_lab_pdf', l('Download PDF of Lab Solutions', 'lab-migration/generate-lab/' . $lab_default_value . '/1'));*/         
         
         }else{
          $commands[] = ajax_command_html('#ajax_selected_lab', '');      
          $commands[] = ajax_command_html('#ajax_selected_lab_pdf', '');  
-         $commands[] = ajax_command_html('#ajax_selected_lab_freeeda', ''); 
+         $commands[] = ajax_command_html('#ajax_selected_lab_dwsim', ''); 
         }
         
       $commands[] = ajax_command_html('#ajax_lab_details', _lab_details($lab_default_value));
@@ -209,7 +209,7 @@ function ajax_experiment_list_callback($form, $form_state) {
 
 		   $commands[] = ajax_command_html('#ajax_lab_details', '');
 		   $commands[] = ajax_command_html('#ajax_selected_lab', '');
-		   $commands[] = ajax_command_html('#ajax_selected_lab_freeeda', ''); 
+		   $commands[] = ajax_command_html('#ajax_selected_lab_dwsim', ''); 
 		   $commands[] = ajax_command_html('#ajax_selected_lab_pdf', '');
 		   $commands[] = ajax_command_data('#ajax_selected_lab', 'form_state_value_select', $form_state['values']['lab']);
 		   $commands[] = ajax_command_html('#ajax_selected_experiment','');

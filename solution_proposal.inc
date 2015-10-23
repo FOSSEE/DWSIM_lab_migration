@@ -24,7 +24,7 @@ function lab_migration_proposal_open()
   return $return_html;
 }
 
-function lab_migration_solution_proposal_form($form_state)
+function lab_migration_solution_proposal_form($form, $form_state)
 {
   global $user;
 
@@ -98,17 +98,7 @@ function lab_migration_solution_proposal_form($form_state)
   $form['solution_provider_department'] = array(
     '#type' => 'select',
     '#title' => t('Department/Branch'),
-    '#options' => array('' => 'Please select...',
-                        'Computer Engineering' => 'Computer Engineering',
-                        'Electrical Engineering' => 'Electrical Engineering',
-                        'Electronics Engineering' => 'Electronics Engineering',
-                        'Chemical Engineering' => 'Chemical Engineering',
-                        'Instrumentation Engineering' => 'Instrumentation Engineering',
-                        'Mechanical Engineering' => 'Mechanical Engineering',
-                        'Civil Engineering' => 'Civil Engineering',
-                        'Physics' => 'Physics',
-                        'Mathematics' => 'Mathematics',
-                        'Others' => 'Others'),
+    '#options' => _list_of_departments(),
     '#required' => TRUE,
   );
   $form['solution_provider_university'] = array(
@@ -118,18 +108,41 @@ function lab_migration_solution_proposal_form($form_state)
     '#maxlength' => 50,
     '#required' => TRUE,
   );
+  $form['version'] = array(
+    '#type' => 'select',
+    '#title' => t('Version'),
+    '#options' => _list_of_software_version(),
+    '#required' => TRUE,    
+  );
+  $form['older'] = array(
+    '#type' => 'textfield',
+    '#size' => 30,
+    '#maxlength' => 50,
+    //'#required' => TRUE,
+    '#description' => t('Specify the Older version used'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="version"]' => array('value' => 'olderversion'),
+      ),
+    ),
+  );
 
   $form['submit'] = array(
     '#type' => 'submit',
-    '#value' => t('Apply for Solution')
+    '#value' => t('Apply for Solution'),
   );
   return $form;
 }
 
-function lab_migration_solution_proposal_form_validate($form_state, &$form_state)
+function lab_migration_solution_proposal_form_validate($form, &$form_state)
 {
 	global $user;
-
+ if($form_state['values']['version'] == 'olderversion'){
+  	if($form_state['values']['older'] == ''){
+  		form_set_error('older', t('Please provide valid version'));
+  	}
+  }
+  return;
 	//$solution_provider_q = db_query("SELECT * FROM {lab_migration_proposal} WHERE solution_provider_uid = ".$user->uid." AND approval_status IN (0, 1) AND solution_status IN (0, 1, 2)");
   $query = db_select('lab_migration_proposal');
             $query->fields('lab_migration_proposal');
@@ -143,12 +156,14 @@ function lab_migration_solution_proposal_form_validate($form_state, &$form_state
 	}
 }
 
-function lab_migration_solution_proposal_form_submit($form_state, &$form_state)
+function lab_migration_solution_proposal_form_submit($form, &$form_state)
 {
   global $user;
 
   $proposal_id = (int)arg(2);
-
+ if($form_state['values']['version'] == 'olderversion'){
+		$form_state['values']['version'] = $form_state['values']['older'];
+	}
   //$proposal_q = db_query("SELECT * FROM {lab_migration_proposal} WHERE id = %d", $proposal_id);
   $query = db_select('lab_migration_proposal');
             $query->fields('lab_migration_proposal');
@@ -165,9 +180,10 @@ function lab_migration_solution_proposal_form_submit($form_state, &$form_state)
     drupal_goto('lab-migration/open-proposal');
   }
 
-  $query = "UPDATE {lab_migration_proposal} set solution_provider_uid = :uid, solution_status = 1, solution_provider_name_title = :solution_provider_name_title, solution_provider_name = :solution_provider_contact_name, solution_provider_contact_ph = :solution_provider_contact_ph, solution_provider_department = :solution_provider_department, solution_provider_university = :solution_provider_university WHERE id = :proposal_id";
+  $query = "UPDATE {lab_migration_proposal} set solution_provider_uid = :uid, solution_status = 1, version = :version, solution_provider_name_title = :solution_provider_name_title, solution_provider_name = :solution_provider_contact_name, solution_provider_contact_ph = :solution_provider_contact_ph, solution_provider_department = :solution_provider_department, solution_provider_university = :solution_provider_university WHERE id = :proposal_id";
     $args = array(
               	":uid" => $user->uid,
+              	      ":version" => $form_state['values']['version'],
               	":solution_provider_name_title" => $form_state['values']['solution_provider_name_title'],
               	":solution_provider_contact_name" => $form_state['values']['solution_provider_name'],
               	":solution_provider_contact_ph" => $form_state['values']['solution_provider_contact_ph'],

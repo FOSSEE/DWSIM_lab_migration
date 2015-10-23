@@ -1,7 +1,7 @@
 <?php
 // $Id$
 
-function lab_migration_settings_form($form_state)
+function lab_migration_settings_form($form, $form_state)
 {
   $form['emails'] = array(
     '#type' => 'textfield',

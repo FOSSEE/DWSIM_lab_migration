@@ -169,7 +169,24 @@ function lab_migration_proposal_form($form,$form_state)
     '#type' => 'item',
     '#markup' => '<hr>',
   );
- 
+ $form['version'] = array(
+    '#type' => 'select',
+    '#title' => t('Version'),
+    '#options' => _list_of_software_version(),
+    '#required' => TRUE,    
+  );
+  $form['older'] = array(
+    '#type' => 'textfield',
+    '#size' => 30,
+    '#maxlength' => 50,
+    //'#required' => TRUE,
+    '#description' => t('Specify the Older version used'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="version"]' => array('value' => 'olderversion'),
+      ),
+    ),
+  );
   $form['lab_title'] = array(
     '#type' => 'textfield',
     '#title' => t('Title of the Lab'),
@@ -254,7 +271,7 @@ function lab_migration_proposal_form_validate($form, &$form_state)
  
  if (!preg_match('/^[0-9\ \+]{0,15}$/', $form_state['values']['contact_ph'])){
     form_set_error('contact_ph', t('Invalid contact phone number'));
-    
+
  }
  if($form_state['values']['country']=='Others'){
          if($form_state['values']['other_country']== ''){
@@ -301,6 +318,12 @@ function lab_migration_proposal_form_validate($form, &$form_state)
 		}
 	    }
 	}
+
+	 if($form_state['values']['version'] == 'olderversion'){
+  	if($form_state['values']['older'] == ''){
+  		form_set_error('older', t('Please provide valid version'));
+  	}
+  }
   return;
 }
 
@@ -337,7 +360,9 @@ function lab_migration_proposal_form_submit($form, &$form_state)
   	$solution_display = 1;
   else
   	$solution_display = 1;
-
+if($form_state['values']['version'] == 'olderversion'){
+		$form_state['values']['version'] = $form_state['values']['older'];
+	}
   /* inserting the user proposal */
     $v = $form_state["values"];
     $lab_title = ucname($v['lab_title']);
@@ -345,9 +370,9 @@ function lab_migration_proposal_form_submit($form, &$form_state)
     $dir_name = $lab_title." ". $university;
     $directory_name = str_replace("__","_",str_replace(" ","_",$dir_name));
   $result = "INSERT INTO {lab_migration_proposal} 
-    (uid, approver_uid, name_title, name, contact_ph, department, university, city, pincode, state, country, lab_title, approval_status, solution_status, solution_provider_uid, solution_display, creation_date, approval_date, solution_date, solution_provider_name_title, solution_provider_name, solution_provider_contact_ph, solution_provider_department, solution_provider_university, directory_name) VALUES
+    (uid, approver_uid, name_title, name, contact_ph, department, university, city, pincode, state, country, version, lab_title, approval_status, solution_status, solution_provider_uid, solution_display, creation_date, approval_date, solution_date, solution_provider_name_title, solution_provider_name, solution_provider_contact_ph, solution_provider_department, solution_provider_university, directory_name) VALUES
     (:uid, :approver_uid, :name_title, :name, :contact_ph, :department, :university, :city, :pincode, :state, :country,
-     :lab_title, :approval_status, :solution_status, :solution_provider_uid, :solution_display, :creation_date, 
+     :version, :lab_title, :approval_status, :solution_status, :solution_provider_uid, :solution_display, :creation_date, 
      :approval_date, :solution_date, :solution_provider_name_title, :solution_provider_name,
       :solution_provider_contact_ph, :solution_provider_department, :solution_provider_university, :directory_name)";
   $args= array(
@@ -362,6 +387,7 @@ function lab_migration_proposal_form_submit($form, &$form_state)
     ":pincode" => $v['pincode'],
     ":state" => $v['all_state'],
     ":country" => $v['country'],
+    ":version" => $form_state['values']['version'],
     ":lab_title" => $v['lab_title'],
     ":approval_status" =>  0,
     ":solution_status" => $solution_status,
@@ -426,9 +452,9 @@ function lab_migration_proposal_form_submit($form, &$form_state)
   drupal_set_message(t('We have received you Lab migration proposal. We will get back to you soon.'), 'status');
   drupal_goto('');
 }
-
+/*
 function _list_of_states(){
-			$states = array(0 => '-Select-');  
+			$states = array();  
 			$query = db_select('list_states_of_india');
 				$query->fields('list_states_of_india');
 				
@@ -442,7 +468,7 @@ function _list_of_states(){
 }
 
 function _list_of_cities(){
-			$city = array(0 => '-Select-');  
+			$city = array();  
 			$query = db_select('list_cities_of_india');
 				$query->fields('list_cities_of_india');
 				$query->orderBy('city', 'ASC');
@@ -455,7 +481,7 @@ function _list_of_cities(){
 }
 
 function _list_of_departments(){
-			$department = array(0 => '-Select-');  
+			$department = array();  
 			$query = db_select('list_of_departments');
 				$query->fields('list_of_departments');
 				$query->orderBy('id', 'DESC');
@@ -466,5 +492,16 @@ function _list_of_departments(){
 			}
 			return $department;
 }
-
-
+function _list_of_software_version(){
+			$software_version = array();  
+			$query = db_select('dwsim_software_version');
+				$query->fields('dwsim_software_version');
+				$query->orderBy('id', 'DESC');
+				$department_list = $query->execute();
+			while ($software_version_list_data = $software_version_list->fetchObject())
+			{
+				$software_version[$software_version_list_data->dwsim_version] = $software_version_list_data->dwsim_version;
+			}
+			return $software_version;
+}
+*/
