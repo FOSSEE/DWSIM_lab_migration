@@ -90,9 +90,8 @@ function lab_migration_upload_code_delete()
     drupal_set_message('Error deleting example.', 'status');
   }
 
-  drupal_goto('lab_migration/code');
+  drupal_goto('lab-migration/code');
   return;
 }
-
 
 ?>

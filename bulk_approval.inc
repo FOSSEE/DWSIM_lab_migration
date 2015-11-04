@@ -519,7 +519,7 @@ Dear !user_name,
 
 Your all the uploaded solutions for the whole Lab with Title : ' . $user_info->lab_title . ' have been marked as dis-approved.
 
-Reason for dis-approval:' . $form_state['values']['message'] . '
+Reason for dis-approval: ' . $form_state['values']['message'] . '
 
 Best Wishes,
 
@@ -621,7 +621,7 @@ Title of Lab :' . $user_info->lab_title . '
 
 List of experiments : ' . $experiment_list . '
 
-Reason for dis-approval:' . $form_state['values']['message'] . '
+Reason for dis-approval: ' . $form_state['values']['message'] . '
 
 Best Wishes,
 
@@ -776,7 +776,7 @@ We regret to inform you that your experiment with the following details under DW
 Experiment name : ' . $experiment_value->title . '
 Caption : ' . $solution_value->caption . '
 
-Reason for dis-approval:' . $form_state['values']['message'] . '
+Reason for dis-approval: ' . $form_state['values']['message'] . '
 
 Please resubmit the modified solution.
 
@@ -927,7 +927,7 @@ We regret to inform you that your experiment with the following details under DW
 Experiment name : ' . $experiment_value->title . '
 Caption : ' . $solution_value->caption . '
 
-Reason for dis-approval:' . $form_state['values']['message'] . '
+Reason for dis-approval: ' . $form_state['values']['message'] . '
 
 Please resubmit the modified solution.
 
