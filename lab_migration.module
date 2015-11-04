@@ -338,7 +338,7 @@ function lab_migration_menu()
   );
 
   /* DOWNLOAD FOR EVERYONE */
-  $items['lab-migration-run'] = array(
+  $items['lab-migration/lab-migration-run'] = array(
     'title' => 'Download Codes',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('lab_migration_run_form'),

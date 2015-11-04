@@ -78,7 +78,7 @@ function lab_migration_proposal_form($form,$form_state)
   $form['department'] = array(
     '#type' => 'select',
     '#title' => t('Department/Branch'),
-    '#options' => _list_of_departments(),
+    '#options' => _lm_list_of_departments(),
     '#required' => TRUE,
   );
   
@@ -138,7 +138,7 @@ function lab_migration_proposal_form($form,$form_state)
   $form['all_state'] = array(
     '#type' => 'select',    
     '#title' => t('State'),
-    '#options' => _list_of_states(),
+    '#options' => _lm_list_of_states(),
     '#validated' => TRUE,
     '#states' => array(
       'visible' => array(
@@ -149,7 +149,7 @@ function lab_migration_proposal_form($form,$form_state)
   $form['city'] = array(
     '#type' => 'select',
     '#title' => t('City'),
-    '#options' => _list_of_cities(),    
+    '#options' => _lm_list_of_cities(),    
     '#states' => array(
       'visible' => array(
         ':input[name="country"]' => array('value' => 'India'),
@@ -172,7 +172,7 @@ function lab_migration_proposal_form($form,$form_state)
  $form['version'] = array(
     '#type' => 'select',
     '#title' => t('Version'),
-    '#options' => _list_of_software_version(),
+    '#options' => _lm_list_of_software_version(),
     '#required' => TRUE,    
   );
   $form['older'] = array(
@@ -438,22 +438,26 @@ if($form_state['values']['version'] == 'olderversion'){
 
   /* sending email */
   $email_to = $user->mail;
+	
+  $from = variable_get('lab_migration_from_email', '');
+  $bcc= variable_get('lab_migration_emails', '');
+  $cc=variable_get('lab_migration_cc_emails', '');
+
   $param['proposal_received']['proposal_id'] = $proposal_id;
   $param['proposal_received']['user_id'] = $user->uid;
- var_dump($param);
-  if (!drupal_mail('lab_migration', 'proposal_received', $email_to , user_preferred_language($user), $param, variable_get('lab_migration_from_email', NULL), TRUE))
-    drupal_set_message('Error sending email message.', 'error');
+  $param['proposal_received']['headers']=array('From'=>$from,'MIME-Version'=> '1.0',
+    			'Content-Type'=> 'text/plain; charset=UTF-8; format=flowed; delsp=yes',
+    			'Content-Transfer-Encoding' => '8Bit',
+    			'X-Mailer'=> 'Drupal','Cc' => $cc, 'Bcc' => $bcc);
 
-  /* sending email */
-  $email_to = variable_get('lab_migration_emails', '');
-  if (!drupal_mail('lab_migration', 'proposal_received', $email_to , user_preferred_language($user), $param, variable_get('lab_migration_from_email', NULL), TRUE))
+  if (!drupal_mail('lab_migration', 'proposal_received', $email_to , user_preferred_language($user), $param, $from, TRUE))
     drupal_set_message('Error sending email message.', 'error');
 
   drupal_set_message(t('We have received you Lab migration proposal. We will get back to you soon.'), 'status');
   drupal_goto('');
 }
-/*
-function _list_of_states(){
+
+function _lm_list_of_states(){
 			$states = array();  
 			$query = db_select('list_states_of_india');
 				$query->fields('list_states_of_india');
@@ -467,7 +471,7 @@ function _list_of_states(){
 			return $states;
 }
 
-function _list_of_cities(){
+function _lm_list_of_cities(){
 			$city = array();  
 			$query = db_select('list_cities_of_india');
 				$query->fields('list_cities_of_india');
@@ -480,7 +484,7 @@ function _list_of_cities(){
 			return $city;
 }
 
-function _list_of_departments(){
+function _lm_list_of_departments(){
 			$department = array();  
 			$query = db_select('list_of_departments');
 				$query->fields('list_of_departments');
@@ -492,16 +496,15 @@ function _list_of_departments(){
 			}
 			return $department;
 }
-function _list_of_software_version(){
+function _lm_list_of_software_version(){
 			$software_version = array();  
 			$query = db_select('dwsim_software_version');
 				$query->fields('dwsim_software_version');
 				$query->orderBy('id', 'DESC');
-				$department_list = $query->execute();
+			$software_version_list = $query->execute();
 			while ($software_version_list_data = $software_version_list->fetchObject())
 			{
 				$software_version[$software_version_list_data->dwsim_version] = $software_version_list_data->dwsim_version;
 			}
 			return $software_version;
 }
-*/

@@ -183,7 +183,7 @@ function lab_migration_solution_proposal_form_submit($form, &$form_state)
   $query = "UPDATE {lab_migration_proposal} set solution_provider_uid = :uid, solution_status = 1, version = :version, solution_provider_name_title = :solution_provider_name_title, solution_provider_name = :solution_provider_contact_name, solution_provider_contact_ph = :solution_provider_contact_ph, solution_provider_department = :solution_provider_department, solution_provider_university = :solution_provider_university WHERE id = :proposal_id";
     $args = array(
               	":uid" => $user->uid,
-              	      ":version" => $form_state['values']['version'],
+              	":version" => $form_state['values']['version'],
               	":solution_provider_name_title" => $form_state['values']['solution_provider_name_title'],
               	":solution_provider_contact_name" => $form_state['values']['solution_provider_name'],
               	":solution_provider_contact_ph" => $form_state['values']['solution_provider_contact_ph'],
@@ -194,17 +194,27 @@ function lab_migration_solution_proposal_form_submit($form, &$form_state)
     $result = db_query($query, $args);
 	drupal_set_message("We have received your application. We will get back to you soon.", 'status');
 
-  /* sending email */
+ /* sending email */
   $email_to = $user->mail;
+
+  $from = variable_get('lab_migration_from_email', '');
+  $bcc= variable_get('lab_migration_emails', '');
+  $cc=variable_get('lab_migration_cc_emails', '');  
+
   $param['solution_proposal_received']['proposal_id'] = $proposal_id;
   $param['solution_proposal_received']['user_id'] = $user->uid;
-  if (!drupal_mail('lab_migration', 'solution_proposal_received', $email_to , language_default(), $param, variable_get('lab_migration_from_email', NULL), TRUE))
+  $param['solution_proposal_received']['headers']=array('From'=>$from,'MIME-Version'=> '1.0',
+    			'Content-Type'=> 'text/plain; charset=UTF-8; format=flowed; delsp=yes',
+    			'Content-Transfer-Encoding' => '8Bit',
+    			'X-Mailer'=> 'Drupal','Cc' => $cc, 'Bcc' => $bcc);
+
+  if (!drupal_mail('lab_migration', 'solution_proposal_received', $email_to , language_default(), $param, $from, TRUE))
     drupal_set_message('Error sending email message.', 'error');
 
   /* sending email */
-  $email_to = variable_get('lab_migration_emails', '');
+ /* $email_to = variable_get('lab_migration_emails', '');
   if (!drupal_mail('lab_migration', 'solution_proposal_received', $email_to , language_default(), $param, variable_get('lab_migration_from_email', NULL), TRUE))
-    drupal_set_message('Error sending email message.', 'error');
+    drupal_set_message('Error sending email message.', 'error');*/
 
 	drupal_goto('lab-migration/open-proposal');
 }

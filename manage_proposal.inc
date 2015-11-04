@@ -356,17 +356,24 @@ function lab_migration_proposal_approval_form_submit($form, &$form_state)
             ":proposal_id" => $proposal_id
         );
         db_query($query, $args);
-        /* sending email */
-        $user_data = user_load($proposal_data->uid);
-        $email_to = $user_data->mail;
-        $param['proposal_approved']['proposal_id'] = $proposal_id;
-        $param['proposal_approved']['user_id'] = $proposal_data->uid;
+         /* sending email */
+    $user_data = user_load($proposal_data->uid);
+    $email_to = $user_data->mail;
+
+    $from = variable_get('lab_migration_from_email', '');
+    $bcc= $user->mail . ', ' .variable_get('lab_migration_emails', '');
+    $cc=variable_get('lab_migration_cc_emails', '');
+
+    $param['proposal_approved']['proposal_id'] = $proposal_id;
+    $param['proposal_approved']['user_id'] = $proposal_data->uid;
+    $param['proposal_approved']['headers']=array('From'=>$from,'MIME-Version'=> '1.0',
+    			'Content-Type'=> 'text/plain; charset=UTF-8; format=flowed; delsp=yes',
+    			'Content-Transfer-Encoding' => '8Bit',
+    			'X-Mailer'=> 'Drupal','Cc' => $cc, 'Bcc' => $bcc);
+    
+    if(!drupal_mail('lab_migration', 'proposal_approved', $email_to,  language_default(), $param, $from, TRUE))
+      drupal_set_message('Error sending email message.', 'error');
        
-        if (!drupal_mail('lab_migration', 'proposal_approved', $email_to, language_default(), $param, variable_get('lab_migration_from_email', NULL), TRUE))
-            drupal_set_message('Error sending email message.', 'error');
-        $email_to = $user->mail . ', ' . variable_get('lab_migration_emails', '');
-        if (!drupal_mail('lab_migration', 'proposal_approved', $email_to, language_default(), $param, variable_get('lab_migration_from_email', NULL), TRUE))
-            drupal_set_message('Error sending email message.', 'error');
         drupal_set_message('Lab migration proposal No. ' . $proposal_id . ' approved. User has been notified of the approval.', 'status');
         drupal_goto('lab-migration/manage-proposal');
         return;
@@ -379,17 +386,24 @@ function lab_migration_proposal_approval_form_submit($form, &$form_state)
             ":proposal_id" => $proposal_id
         );
         $result = db_query($query, $args);
-        /* sending email */
-        $user_data = user_load($proposal_data->uid);
-        $email_to = $user_data->mail;
-        $param['proposal_disapproved']['proposal_id'] = $proposal_id;
-        $param['proposal_disapproved']['user_id'] = $proposal_data->uid;
-        if (!drupal_mail('lab_migration', 'proposal_disapproved', $email_to, language_default(), $param, variable_get('lab_migration_from_email', NULL), TRUE))
-            drupal_set_message('Error sending email message.', 'error');
-        $email_to = $user_data->mail . ', ' . variable_get('lab_migration_emails', '');
-        ;
-        if (!drupal_mail('lab_migration', 'proposal_disapproved', $email_to, language_default(), $param, variable_get('lab_migration_from_email', NULL), TRUE))
-            drupal_set_message('Error sending email message.', 'error');
+       /* sending email */
+    $user_data = user_load($proposal_data->uid);
+    $email_to = $user_data->mail;
+
+    $from=variable_get('lab_migration_from_email', '');
+    $bcc=$user->mail . ', ' .variable_get('lab_migration_emails', '');
+    $cc=variable_get('lab_migration_cc_emails', '');
+	
+    $param['proposal_disapproved']['proposal_id'] = $proposal_id;
+    $param['proposal_disapproved']['user_id'] = $proposal_data->uid;
+    $param['proposal_disapproved']['headers']=array('From'=>$from,'MIME-Version'=> '1.0',
+    			'Content-Type'=> 'text/plain; charset=UTF-8; format=flowed; delsp=yes',
+    			'Content-Transfer-Encoding' => '8Bit',
+    			'X-Mailer'=> 'Drupal','Cc' => $cc, 'Bcc' => $bcc);
+
+    if (!drupal_mail('lab_migration', 'proposal_disapproved', $email_to , language_default(), $param,$from, TRUE))
+      drupal_set_message('Error sending email message.', 'error');
+        
         drupal_set_message('Lab migration proposal No. ' . $proposal_id . ' dis-approved. User has been notified of the dis-approval.', 'error');
         drupal_goto('lab-migration/manage-proposal');
         return;
@@ -580,23 +594,32 @@ function lab_migration_proposal_status_form_submit($form, &$form_state)
             drupal_set_message('Error in update status', 'error');
             return;
         }
-        /* sending email */
-        $user_data = user_load($proposal_data->uid);
-        $email_to = $user_data->mail;
-        $param['proposal_completed']['proposal_id'] = $proposal_id;
-        $param['proposal_completed']['user_id'] = $proposal_data->uid;
-        if (!drupal_mail('lab_migration', 'proposal_completed', $email_to, language_default(), $param, variable_get('lab_migration_from_email', NULL), TRUE)) {
-            drupal_set_message('Error sending email message.', 'error');
-        }
-        $email_to = $user->mail . ', ' . variable_get('lab_migration_emails', '');
-        ;
-        if (!drupal_mail('lab_migration', 'proposal_completed', $email_to, language_default(), $param, variable_get('lab_migration_from_email', NULL), TRUE)) {
-            drupal_set_message('Error sending email message.', 'error');
-        }
-        drupal_set_message('Congratulations! Lab Migration proposal has been marked as completed. User has been notified of the completion.', 'status');
-    }
-    drupal_goto('lab-migration/manage-proposal');
-    return;
+      /* sending email */
+    $user_data = user_load($proposal_data->uid);
+    $email_to = $user_data->mail;
+
+    $from=variable_get('lab_migration_from_email', '');
+    $bcc=$user->mail . ', ' .variable_get('lab_migration_emails', '');
+    $cc=variable_get('lab_migration_cc_emails', '');
+
+    $param['proposal_completed']['proposal_id'] = $proposal_id;
+    $param['proposal_completed']['user_id'] = $proposal_data->uid;
+    $param['proposal_completed']['headers']=array('From'=>$from,'MIME-Version'=> '1.0',
+    			'Content-Type'=> 'text/plain; charset=UTF-8; format=flowed; delsp=yes',
+    			'Content-Transfer-Encoding' => '8Bit',
+    			'X-Mailer'=> 'Drupal','Cc' => $cc, 'Bcc' => $bcc);
+
+    if (!drupal_mail('lab_migration', 'proposal_completed', $email_to , language_default(), $param, $from, TRUE))
+      drupal_set_message('Error sending email message.', 'error');
+
+    /*$email_to = $user->mail . ', ' . variable_get('lab_migration_emails', '');;
+    if (!drupal_mail('lab_migration', 'proposal_completed', $email_to , language_default(), $param, variable_get('lab_migration_from_email', NULL), TRUE))
+      drupal_set_message('Error sending email message.', 'error');*/
+ 
+    drupal_set_message('Congratulations! Lab Migration proposal has been marked as completed. User has been notified of the completion.', 'status');
+  }
+  drupal_goto('lab-migration/manage-proposal');
+  return;
 }
 /******************************************************************************/
 /**************************** PROPOSAL EDIT FORM ******************************/
@@ -662,7 +685,7 @@ function lab_migration_proposal_edit_form($form, $form_state)
     $form['department'] = array(
         '#type' => 'select',
         '#title' => t('Department/Branch'),
-        '#options' => _list_of_departments(),
+        '#options' => _lm_list_of_departments(),
         '#required' => TRUE,
         '#default_value' => $proposal_data->department
     );
@@ -737,7 +760,7 @@ function lab_migration_proposal_edit_form($form, $form_state)
     $form['all_state'] = array(
         '#type' => 'select',
         '#title' => t('State'),
-        '#options' => _list_of_states(),
+        '#options' => _lm_list_of_states(),
         '#default_value' => $proposal_data->state,
         '#validated' => TRUE,
         '#states' => array(
@@ -751,7 +774,7 @@ function lab_migration_proposal_edit_form($form, $form_state)
     $form['city'] = array(
         '#type' => 'select',
         '#title' => t('City'),
-        '#options' => _list_of_cities(),
+        '#options' => _lm_list_of_cities(),
         '#default_value' => $proposal_data->city,
         '#states' => array(
             'visible' => array(
@@ -1193,7 +1216,7 @@ function lab_migration_category_edit_form($form, $form_state)
     $form['category'] = array(
         '#type' => 'select',
         '#title' => t('Category'),
-        '#options' => _list_of_departments(),
+        '#options' => _lm_list_of_departments(),
         '#required' => TRUE,
         '#default_value' => $proposal_data->category
     );
@@ -1238,7 +1261,7 @@ function lab_migration_category_edit_form_submit($form, &$form_state)
     drupal_set_message(t('Proposal Category Updated'), 'status');
     drupal_goto('lab-migration/manage-proposal/category');
 }
-function _list_of_departments()
+function _lm_list_of_departments()
 {
     $department = array(
         0 => '-Select-'
@@ -1252,7 +1275,7 @@ function _list_of_departments()
     }
     return $department;
 }
-function _list_of_states()
+function _lm_list_of_states()
 {
     $states = array(
         0 => '-Select-'
@@ -1266,7 +1289,7 @@ function _list_of_states()
     }
     return $states;
 }
-function _list_of_cities()
+function _lm_list_of_cities()
 {
     $city = array();
     $query = db_select('list_cities_of_india');
@@ -1294,12 +1317,14 @@ function CreateReadmeFileLabMigration($proposal_id)
     $txt .= "Proposar Name: " . $proposal_data->name_title . " " . $proposal_data->name . "\n";
     $txt .= "Department: " . $proposal_data->department . "\n";
     $txt .= "University: " . $proposal_data->university . "\n";
-    $txt .= "Categoery: " . $proposal_data->department . "\n\n";
+    $txt .= "Category: " . $proposal_data->department . "\n\n";
     $txt .= "\n" . "\n";
     $txt .= "Solution provider";
     $txt .= "\n" . "\n";
     $txt .= "Solution Provider Name: " . $proposal_data->solution_provider_name_title . " " . $proposal_data->solution_provider_name . "\n";
     $txt .= "Solution Provider University: " . $proposal_data->solution_provider_university . "\n";
+    $txt .= "\n" . "\n";
+    $txt .= "Lab Migration Project By FOSSEE, IIT Bombay" . "\n";
     fwrite($readme_file, $txt);
     fclose($readme_file);
     return $txt;

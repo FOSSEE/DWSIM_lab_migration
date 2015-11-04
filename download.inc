@@ -292,7 +292,7 @@ function lab_migration_download_lab()
      }
   } else {
     drupal_set_message("There are no solutions in this Lab to download", 'error');
-    drupal_goto('lab_migration_run');
+    drupal_goto('lab-migration/lab-migration-run');
   }
 }
 

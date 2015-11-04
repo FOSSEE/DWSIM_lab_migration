@@ -7,7 +7,7 @@
 		
 		$select_two = isset($form_state['values']['lab_experiment_list']) ? $form_state['values']['lab_experiment_list'] : 
 		key($options_two);
- 		$url_lab_id = (int)arg(1);
+ 		$url_lab_id = (int)arg(2);
 			if(!$url_lab_id){
 				$selected = isset($form_state['values']['lab']) ? $form_state['values']['lab'] : key($options_first);
 			}elseif($url_lab_id == ''){
