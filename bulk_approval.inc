@@ -259,7 +259,7 @@ function ajax_bulk_solution_list_callback($form, $form_state)
       {
         $form['lab_experiment_actions']['#options'] = _bulk_list_experiment_actions();
         $form['lab_solution_list']['#options'] = _ajax_bulk_get_solution_list($experiment_list_default_value);
-        $commands[] = ajax_command_html('#ajax_download_experiment', l('Download Experiment', 'lab-migration/download/experiment/' . $experiment_list_default_value));
+        $commands[] = ajax_command_html('#ajax_download_experiment', l('Download Experiment', 'lab-migration/full-download/experiment/' . $experiment_list_default_value));
         $commands[] = ajax_command_data('#ajax_selected_experiment', 'form_state_value_select', $form_state['values']['lab_experiment_list']);
         $commands[] = ajax_command_html('#ajax_selected_experiment', drupal_render($form['lab_experiment_list']));
         $commands[] = ajax_command_html('#ajax_selected_lab_experiment_action', drupal_render($form['lab_experiment_actions']));

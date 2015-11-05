@@ -5,16 +5,17 @@ function lab_migration_download_solution_file()
     $solution_file_id = arg(3);
     $root_path = lab_migration_path();
     // $solution_files_q = db_query("SELECT * FROM {lab_migration_solution_files} WHERE id = %d LIMIT 1", $solution_file_id);
-    $query = db_select('lab_migration_solution_files');
+    $solution_files_q = db_query("SELECT lmsf.*, lmp.directory_name FROM lab_migration_solution_files lmsf JOIN lab_migration_solution lms JOIN lab_migration_experiment lme JOIN lab_migration_proposal lmp WHERE lms.id = lmsf.solution_id AND lme.id = lms.experiment_id AND lmp.id = lme.proposal_id AND lmsf.id = :solution_id LIMIT 1", array(':solution_id' => $solution_file_id));
+    /*$query = db_select('lab_migration_solution_files');
     $query->fields('lab_migration_solution_files');
     $query->condition('id', $solution_file_id);
     $query->range(0, 1);
-    $solution_files_q = $query->execute();
+    $solution_files_q = $query->execute();*/
     $solution_file_data = $solution_files_q->fetchObject();
     header('Content-Type: ' . $solution_file_data->filemime);
     header('Content-disposition: attachment; filename="' . str_replace(' ', '_', ($solution_file_data->filename)) . '"');
-    header('Content-Length: ' . filesize($root_path . $solution_file_data->filepath));
-    readfile($root_path . $solution_file_data->filepath);
+    header('Content-Length: ' . filesize($root_path . $solution_file_data->directory_name . '/' . $solution_file_data->filepath));
+    readfile($root_path . $solution_file_data->directory_name . '/' . $solution_file_data->filepath);
   }
 function lab_migration_download_dependency_file()
   {
@@ -50,10 +51,11 @@ function lab_migration_download_solution()
     $experiment_q = $query->execute();
     $experiment_data = $experiment_q->fetchObject();
     //$solution_files_q = db_query("SELECT * FROM {lab_migration_solution_files} WHERE solution_id = %d", $solution_id);
-    $query = db_select('lab_migration_solution_files');
+    /*$query = db_select('lab_migration_solution_files');
     $query->fields('lab_migration_solution_files');
     $query->condition('solution_id', $solution_id);
-    $solution_files_q = $query->execute();
+    $solution_files_q = $query->execute();*/
+    $solution_files_q = db_query("SELECT lmsf.*, lmp.directory_name FROM lab_migration_solution_files lmsf JOIN lab_migration_solution lms JOIN lab_migration_experiment lme JOIN lab_migration_proposal lmp WHERE lms.id = lmsf.solution_id AND lme.id = lms.experiment_id AND lmp.id = lme.proposal_id AND lmsf.id = :solution_id", array(':solution_id' => $solution_id));
     //$solution_dependency_files_q = db_query("SELECT * FROM {lab_migration_solution_dependency} WHERE solution_id = %d", $solution_id);
     $query = db_select('lab_migration_solution_dependency');
     $query->fields('lab_migration_solution_dependency');
@@ -67,7 +69,7 @@ function lab_migration_download_solution()
     $zip->open($zip_filename, ZipArchive::CREATE);
     while ($solution_files_row = $solution_files_q->fetchObject())
       {
-        $zip->addFile($root_path . $solution_files_row->filepath, $CODE_PATH . str_replace(' ', '_', ($solution_files_row->filename)));
+        $zip->addFile($root_path . $solution_files_row->directory_name . '/' . $solution_files_row->filepath, $CODE_PATH . str_replace(' ', '_', ($solution_files_row->filename)));
       }
     /* dependency files */
     while ($solution_dependency_files_row = $solution_dependency_files_q->fetchObject())
@@ -97,12 +99,13 @@ function lab_migration_download_solution()
     else
       {
         drupal_set_message("There are no files in this solutions to download", 'error');
-        drupal_goto('lab_migration_run');
+        drupal_goto('lab-migration/lab-migration-run');
       }
   }
 function lab_migration_download_experiment()
   {
-    $experiment_id = arg(3);
+    $experiment_id = (int)arg(3);
+    
     $root_path = lab_migration_path();
     /* get solution data */
     //$experiment_q = db_query("SELECT * FROM {lab_migration_experiment} WHERE id = %d", $experiment_id);
@@ -127,20 +130,21 @@ function lab_migration_download_experiment()
       {
         $CODE_PATH = 'CODE' . $solution_row->code_number . '/';
         // $solution_files_q = db_query("SELECT * FROM {lab_migration_solution_files} WHERE solution_id = %d", $solution_row->id);
-        $query = db_select('lab_migration_solution_files');
+         $solution_files_q = db_query("SELECT lmsf.*, lmp.directory_name FROM lab_migration_solution_files lmsf JOIN lab_migration_solution lms JOIN lab_migration_experiment lme JOIN lab_migration_proposal lmp WHERE lms.id = lmsf.solution_id AND lme.id = lms.experiment_id AND lmp.id = lme.proposal_id AND lmsf.solution_id = :solution_id", array(':solution_id' => $solution_row->id));
+       /* $query = db_select('lab_migration_solution_files');
         $query->fields('lab_migration_solution_files');
         $query->condition('solution_id', $solution_row->id);
-        $solution_files_q = $query->execute();
-        // $solution_dependency_files_q = db_query("SELECT * FROM {lab_migration_solution_dependency} WHERE solution_id = %d", $solution_row->id);
+        $solution_files_q = $query->execute();*/
+        // $solution_dependency_files_q = db_query("SELECT * FROM {lab_migration_solution_dependency} WHERE solution_id = %d", $solution_row->id);        
+        while ($solution_files_row = $solution_files_q->fetchObject())
+          {
+            $zip->addFile($root_path . $solution_files_row->directory_name .'/'. $solution_files_row->filepath, $EXP_PATH . $CODE_PATH . str_replace(' ', '_', ($solution_files_row->filename)));
+          }
+        /* dependency files */
         $query = db_select('lab_migration_solution_dependency');
         $query->fields('lab_migration_solution_dependency');
         $query->condition('solution_id', $solution_row->id);
         $solution_dependency_files_q = $query->execute();
-        while ($solution_files_row = $solution_files_q->fetchObject())
-          {
-            $zip->addFile($root_path . $solution_files_row->filepath, $EXP_PATH . $CODE_PATH . str_replace(' ', '_', ($solution_files_row->filename)));
-          }
-        /* dependency files */
         while ($solution_dependency_files_row = $solution_dependency_files_q->fetchObject())
           {
             //$dependency_file_data = (db_query("SELECT * FROM {lab_migration_dependency_files} WHERE id = %d LIMIT 1", $solution_dependency_files_row->dependency_id))->fetchObject();
@@ -169,7 +173,7 @@ function lab_migration_download_experiment()
     else
       {
         drupal_set_message("There are no solutions in this experiment to download", 'error');
-        drupal_goto('lab_migration_run');
+        drupal_goto('lab-migration/lab-migration-run');
       }
   }
 function lab_migration_download_lab()
@@ -208,10 +212,12 @@ function lab_migration_download_lab()
           {
             $CODE_PATH = 'CODE' . $solution_row->code_number . '/';
             //$solution_files_q = db_query("SELECT * FROM {lab_migration_solution_files} WHERE solution_id = %d", $solution_row->id);
-            $query = db_select('lab_migration_solution_files');
+            
+            $solution_files_q = db_query("SELECT lmsf.*, lmp.directory_name FROM lab_migration_solution_files lmsf JOIN lab_migration_solution lms JOIN lab_migration_experiment lme JOIN lab_migration_proposal lmp WHERE lms.id = lmsf.solution_id AND lme.id = lms.experiment_id AND lmp.id = lme.proposal_id AND lmsf.id = :solution_id", array(':solution_id' => $solution_row->id));
+            /*$query = db_select('lab_migration_solution_files');
             $query->fields('lab_migration_solution_files');
             $query->condition('solution_id', $solution_row->id);
-            $solution_files_q = $query->execute();
+            $solution_files_q = $query->execute();*/
             //$solution_dependency_files_q = db_query("SELECT * FROM {lab_migration_solution_dependency} WHERE solution_id = %d", $solution_row->id);
             $query = db_select('lab_migration_solution_dependency');
             $query->fields('lab_migration_solution_dependency');
@@ -219,7 +225,7 @@ function lab_migration_download_lab()
             $solution_dependency_files_q = $query->execute();
             while ($solution_files_row = $solution_files_q->fetchObject())
               {
-                $zip->addFile($root_path . $solution_files_row->filepath, $EXP_PATH . $CODE_PATH . str_replace(' ', '_', ($solution_files_row->filename)));
+                $zip->addFile($root_path . $solution_files_row->directory_name . '/' . $solution_files_row->filepath, $EXP_PATH . $CODE_PATH . str_replace(' ', '_', ($solution_files_row->filename)));
                 //var_dump($zip->numFiles);
               }
             // die;

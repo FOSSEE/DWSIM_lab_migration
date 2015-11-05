@@ -204,7 +204,7 @@ function lab_migration_upload_code_form($form,$form_state)
   $form['dwsim_version'] = array(
     '#type' => 'select',
     '#title' => t('DWSIM version used'),
-    '#options' => list_dwsim_software_version(),
+    '#options' => _lm_list_of_software_version(),
     '#required' => TRUE,
   );
   $form['toolbox_used'] = array(
@@ -500,7 +500,8 @@ function lab_migration_upload_code_form_submit($form, &$form_state) {
   $dest_path .= 'CODE' . $experiment_data->number . '.' . $form_state['values']['code_number'] . '/';
   if (!is_dir($root_path . $dest_path))
     mkdir($root_path . $dest_path);
-
+ /* creating file path */
+ $file_path = 'EXP' . $experiment_data->number . '/' . 'CODE' . $experiment_data->number . '.' . $form_state['values']['code_number'] . '/';
   /* creating solution database entry */
   $query = "INSERT INTO {lab_migration_solution} (experiment_id, approver_uid, code_number, caption, approval_date, approval_status, timestamp, os_used, dwsim_version, toolbox_used) VALUES (:experiment_id, :approver_uid, :code_number, :caption, :approval_date, :approval_status, :timestamp, :os_used, :dwsim_version, :toolbox_used)";
     $args = array(
@@ -565,8 +566,8 @@ function lab_migration_upload_code_form_submit($form, &$form_state) {
           $args = array(
                     ":solution_id" => $solution_id,
                     ":filename" => $_FILES['files']['name'][$file_form_name],
-                    ":filepath" => $dest_path . $_FILES['files']['name'][$file_form_name],
-                    ":filemime" => $_FILES['files']['type'][$file_form_name],
+                    ":filepath" => $file_path . $_FILES['files']['name'][$file_form_name],
+                    ":filemime" => 'application/dwxml',
                     ":filesize" => $_FILES['files']['size'][$file_form_name],
                     ":filetype" => $file_type,
                     ":timestamp" => time()
@@ -648,17 +649,17 @@ function _list_of_dependency_files()
   }
   return array($dependency_files, $dependency_files_class,  $dependency_files_value);
 }
-
-function list_dwsim_software_version(){
-      $dwsim_version = array(0 => '-Select-');  
-			$query = db_select('dwsim_software_version');
-				$query->fields('dwsim_software_version');
-				//$query->orderBy('city', 'ASC');
-				$dwsim_version_list = $query->execute();
-			while ($dwsim_version_list_data = $dwsim_version_list->fetchObject())
-			{
-				$dwsim_version[$dwsim_version_list_data->dwsim_version] = $dwsim_version_list_data->dwsim_version;
-			}
-			return $dwsim_version;
-}
+function _lm_list_of_software_version()
+  {
+    $software_version = array();
+    $query = db_select('dwsim_software_version');
+    $query->fields('dwsim_software_version');
+    $query->orderBy('id', 'ASC');
+    $software_version_list = $query->execute();
+    while ($software_version_list_data = $software_version_list->fetchObject())
+      {
+        $software_version[$software_version_list_data->dwsim_version] = $software_version_list_data->dwsim_version;
+      }
+    return $software_version;
+  }
 

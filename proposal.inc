@@ -419,10 +419,10 @@ function lab_migration_proposal_form_submit($form, &$form_state)
       }
     /* inserting the user proposal */
     $v = $form_state["values"];
-    $lab_title = ucname($v['lab_title']);
-    $university = ucname($v['university']);
-    $dir_name = $lab_title . " " . $university;
-    $directory_name = str_replace("__", "_", str_replace(" ", "_", $dir_name));
+    $lab_title = $v['lab_title'];
+    $proposar_name = $v['name_title']. ' ' . $v['name'];
+    $university = $v['university'];    
+    $directory_name = _lm_dir_name($lab_title, $proposar_name, $university);
     $result = "INSERT INTO {lab_migration_proposal} 
     (uid, approver_uid, name_title, name, contact_ph, department, university, city, pincode, state, country, version, lab_title, approval_status, solution_status, solution_provider_uid, solution_display, creation_date, approval_date, solution_date, solution_provider_name_title, solution_provider_name, solution_provider_contact_ph, solution_provider_department, solution_provider_university, directory_name) VALUES
     (:uid, :approver_uid, :name_title, :name, :contact_ph, :department, :university, :city, :pincode, :state, :country,
@@ -475,10 +475,11 @@ function lab_migration_proposal_form_submit($form, &$form_state)
         $experiment_description = 'lab_experiment_description-' . $counter;
         if (strlen(trim($form_state['values'][$experiment_field_name])) >= 1)
           {
-            $query = "INSERT INTO {lab_migration_experiment} (proposal_id, directory_name, number, title,description) VALUES (:proposal_id, :directory_name, :number, :experiment_field_name,:description)";
+            //$query = "INSERT INTO {lab_migration_experiment} (proposal_id, directory_name, number, title,description) VALUES (:proposal_id, :directory_name, :number, :experiment_field_name,:description)";
+             $query = "INSERT INTO {lab_migration_experiment} (proposal_id, number, title,description) VALUES (:proposal_id, :number, :experiment_field_name,:description)";
             $args = array(
                 ":proposal_id" => $proposal_id,
-                ":directory_name" => $directory_name,
+               // ":directory_name" => $directory_name,
                 ":number" => $number,
                 ":experiment_field_name" => trim($form_state['values'][$experiment_field_name]),
                 ":description" => trim($form_state['values'][$experiment_description])
@@ -517,7 +518,7 @@ function lab_migration_proposal_form_submit($form, &$form_state)
   }
 function _lm_list_of_states()
   {
-    $states = array();
+    $states = array(0 => '-Select-');
     $query = db_select('list_states_of_india');
     $query->fields('list_states_of_india');
     //$query->orderBy('', '');
@@ -530,7 +531,7 @@ function _lm_list_of_states()
   }
 function _lm_list_of_cities()
   {
-    $city = array();
+    $city = array(0 => '-Select-');
     $query = db_select('list_cities_of_india');
     $query->fields('list_cities_of_india');
     $query->orderBy('city', 'ASC');
@@ -566,4 +567,13 @@ function _lm_list_of_software_version()
         $software_version[$software_version_list_data->dwsim_version] = $software_version_list_data->dwsim_version;
       }
     return $software_version;
+  }
+function _lm_dir_name($lab, $name, $university)
+  {
+    $lab_title = ucname($lab);
+    $proposar_name = ucname($lab);
+    $university_name = ucname($university);
+    $dir_name = $lab_title . " " . "by". " " . $proposar_name . ' ' . $university_name;
+    $directory_name = str_replace("__", "_", str_replace(" ", "_", $dir_name));
+    return $directory_name;
   }

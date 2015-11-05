@@ -14,7 +14,7 @@ function lab_migration_install()
     variable_set('lab_migration_result_extensions', '');
     variable_set('lab_migration_xcos_extensions', '');
     // create uploads folder
-    $upload_path = $_SERVER['DOCUMENT_ROOT'] . base_path() . 'lab_migration_uploads';
+    $upload_path = $_SERVER['DOCUMENT_ROOT'] . base_path() . 'dwsim_uploads/lab_migration_uploads';
     if (!is_dir($upload_path))
         mkdir($upload_path);
     if (!is_dir($upload_path . '/latex'))

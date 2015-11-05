@@ -425,7 +425,7 @@ function _list_of_labs()
     $lab_titles_q = $query->execute();
     while ($lab_titles_data = $lab_titles_q->fetchObject())
       {
-        $lab_titles[$lab_titles_data->id] = $lab_titles_data->lab_title . ' (Proposed by ' . $lab_titles_data->name . ')';
+        $lab_titles[$lab_titles_data->id] = $lab_titles_data->lab_title . ' (Proposed by ' . $lab_titles_data->name_title .' '.$lab_titles_data->name . ')';
       }
     return $lab_titles;
   }
@@ -474,9 +474,17 @@ function _lab_information($proposal_id)
     $query = db_select('lab_migration_proposal');
     $query->fields('lab_migration_proposal');
     $query->condition('id', $proposal_id);
+    $query->condition('approval_status', 3);
     $lab_q = $query->execute();
     $lab_data = $lab_q->fetchObject();
-    return $lab_data;
+    if($lab_data){
+     return $lab_data;
+      }
+    else 
+      {
+        return ;
+      }
+   
   }
 function _lab_details($lab_default_value)
   {
@@ -484,6 +492,7 @@ function _lab_details($lab_default_value)
     $lab_details = _lab_information($lab_default_value);
     if ($lab_default_value != 0)
       {
+        if ($lab_details){
         if ($lab_details->solution_provider_uid > 0)
           {
             $user_solution_provider = user_load($lab_details->solution_provider_uid);
@@ -499,9 +508,13 @@ function _lab_details($lab_default_value)
         else
           {
             $solution_provider = '<span style="color: rgb(128, 0, 0);"><strong>Solution Provider</strong></span></td><td style="width: 35%;"><br />' . '<ul>' . '<li><strong>Solution Provider: </strong> (Open) </li>' . '</ul>';
-          }
+          }}
+          else{
+          drupal_goto('lab-migration/lab-migration-run');
+          
       }
     $form['lab_details']['#markup'] = '<span style="color: rgb(128, 0, 0);"><strong>About the Lab</strong></span></td><td style="width: 35%;"><br />' . '<ul>' . '<li><strong>Proposer Name:</strong> ' . $lab_details->name_title . ' ' . $lab_details->name . '</li>' . '<li><strong>Title of the Lab:</strong> ' . $lab_details->lab_title . '</li>' . '<li><strong>Department:</strong> ' . $lab_details->department . '</li>' . '<li><strong>University:</strong> ' . $lab_details->university . '</li>' . '<li><strong>Category:</strong> ' . $lab_details->category . '</li>' . '</ul>' . $solution_provider;
     $details = $form['lab_details']['#markup'];
     return $details;
+    }
   }

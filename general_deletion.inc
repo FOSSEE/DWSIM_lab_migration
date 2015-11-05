@@ -19,10 +19,7 @@ function lab_migration_delete_solution($solution_id)
         return FALSE;
       }
     //$experiment_q = db_query("SELECT * FROM {lab_migration_experiment} WHERE id = %d", $solution_data->experiment_id);
-    $query = db_select('lab_migration_experiment');
-    $query->fields('lab_migration_experiment');
-    $query->condition('id', $solution_data->experiment_id);
-    $experiment_q = $query->execute();
+    $experiment_q = db_query("SELECT lme.*, lmp.id, lmp.directory_name FROM lab_migration_experiment lme JOIN lab_migration_proposal lmp WHERE lmp.id = lme.proposal_id AND lme.id = :experiment_id",array(':experiment_id' => $solution_data->experiment_id));
     $experiment_data = $experiment_q->fetchObject();
     if (!$experiment_data)
       {
@@ -31,26 +28,27 @@ function lab_migration_delete_solution($solution_id)
       }
     /* deleting solution files */
     //$solution_files_q = db_query("SELECT * FROM {lab_migration_solution_files} WHERE solution_id = %d", $solution_id);
-    $query = db_select('lab_migration_solution_files');
+    $solution_files_q = db_query("SELECT lmsf.*, lmp.directory_name FROM lab_migration_solution_files lmsf JOIN lab_migration_solution lms JOIN lab_migration_experiment lme JOIN lab_migration_proposal lmp WHERE lms.id = lmsf.solution_id AND lme.id = lms.experiment_id AND lmp.id = lme.proposal_id AND lmsf.id = :solution_id", array(':solution_id' => $solution_id));
+    /*$query = db_select('lab_migration_solution_files');
     $query->fields('lab_migration_solution_files');
     $query->condition('solution_id', $solution_id);
-    $solution_files_q = $query->execute();
+    $solution_files_q = $query->execute();*/
     while ($solution_files_data = $solution_files_q->fetchObject())
       {
-        if (!file_exists($root_path . $solution_files_data->filepath))
+        if (!file_exists($root_path .$solution_files_data->directory_name. '/'. $solution_files_data->filepath))
           {
             $status = FALSE;
             drupal_set_message(t('Error deleting !file. File does not exists.', array(
-                '!file' => $solution_files_data->filepath
+                '!file' => $solution_files_data->directory_name. '/' . $solution_files_data->filepath
             )), 'error');
             continue;
           }
         /* removing solution file */
-        if (!unlink($root_path . $solution_files_data->filepath))
+        if (!unlink($root_path . $solution_files_data->directory_name. '/'. $solution_files_data->filepath))
           {
             $status = FALSE;
             drupal_set_message(t('Error deleting !file', array(
-                '!file' => $solution_files_data->filepath
+                '!file' => $solution_files_data->directory_name. '/' . $solution_files_data->filepath
             )), 'error');
             /* sending email to admins */
             $email_to = variable_get('lab_migration_emails', '');
@@ -61,7 +59,7 @@ function lab_migration_delete_solution($solution_id)
             $param['standard']['body'] = "Error deleting solution files by " . $user->uid . " at " . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . " :
         solution id : " . $solution_id . "
         file id : " . $solution_files_data->id . "
-        file path : " . $solution_files_data->filepath . "
+        file path : " . $solution_files_data->directory_name. '/'. $solution_files_data->filepath . "
 	PDF path : " . $PdfStatus;
             $param['standard']['headers'] = array(
                 'From' => $from,
