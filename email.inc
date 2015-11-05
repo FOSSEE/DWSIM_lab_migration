@@ -514,22 +514,18 @@ FOSSEE,IIT Bombay', array(
                 'body' => t('
 Dear !user_name,
 
-We have received your proposal for solution for following Lab migration :
-
-Full Name : ' . $proposal_data->name_title . ' ' . $proposal_data->name . '
-Email : ' . $user_data->mail . '
-Contact No. : ' . $proposal_data->contact_ph . '
-Department/Branch : ' . $proposal_data->department . '
-University/Institute : ' . $proposal_data->university . '
-City : ' . $proposal_data->city . '
-State : ' . $proposal_data->state . '
-
-
-Solution Provided By : ' . $proposal_data->name_title . '
+We have received your proposal for providing solution for lab migration with the following details:
 
 List of experiments : ' . $experiment_list . '
 
-Your proposal is under review and you will soon receive an email from us regarding the same.
+Full Name : ' . $proposal_data->solution_provider_name_title . ' '. $proposal_data->solution_provider_name . '
+Email : ' . $user->mail . '
+Contact No. : ' . $proposal_data->solution_provider_contact_ph . '
+Department/Branch : ' . $proposal_data->department . '
+University/Institute : ' . $proposal_data->solution_provider_university . '
+
+
+Your proposal is under review. You will soon receive an email when the same has been approved / disapproved.
 
 Please ensure that ALL the codes follow guidelines at http://dwsim.fossee.in/lab-migration-project/lab-migration-guidelines
 
