@@ -93,5 +93,3 @@ function lab_migration_upload_code_delete()
   drupal_goto('lab-migration/code');
   return;
 }
-
-?>

@@ -67,4 +67,3 @@ function lab_migration_labs_progress_all()
       }
     return $page_content;
   }
-?>
