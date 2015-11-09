@@ -20,10 +20,15 @@ lab_migration_solution : approval_status
 1 - Approved
 2 - Disapproved (delete it)
 */
-function lab_migration_proposal_form($form, $form_state)
+function lab_migration_proposal_form($form, &$form_state)
   {
     global $user;
     /************************ start approve book details ************************/
+    if ($user->uid == 0) {
+        $msg =  drupal_set_message(t('It is mandatory to ' . l('login', 'user') . ' on this website to access the lab proposal form. If you are new user please create a new account first.'), 'error');
+         drupal_goto('lab-migration-project');
+         return $msg;
+    }
     $query = db_select('lab_migration_proposal');
     $query->fields('lab_migration_proposal');
     $query->condition('uid', $user->uid);
