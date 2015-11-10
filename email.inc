@@ -58,12 +58,12 @@ Email : ' . $user_data->mail . '
 Contact No. : ' . $proposal_data->solution_provider_contact_ph . '
 Department/Branch : ' . $proposal_data->solution_provider_department . '
 University/Institute : ' . $proposal_data->solution_provider_university . '
-City : ' . $proposal_data->city . '
-State : ' . $proposal_data->state . '
+City : ' . $proposal_data->solution_provider_city . '
+State : ' . $proposal_data->solution_provider_state . '
 
 List of experiments : ' . $experiment_list . '
 
-Please ensure that ALL the codes follow guidelines at http://dwsim.fossee.in/lab-migration-project/lab-migration-guidelines
+Please ensure that ALL the codes follow guidelines at http://esim.fossee.in/lab-migration-project/lab-migration-guidelines
 
 Best Wishes,
 
@@ -78,6 +78,27 @@ FOSSEE,IIT Bombay', array(
             break;
         case 'solution_proposal_disapproved':
             $user_data = user_load($params['solution_proposal_disapproved']['user_id']);
+            $proposal_id = $params['solution_proposal_disapproved']['proposal_id'];
+            $query = db_select('lab_migration_proposal');
+            $query->fields('lab_migration_proposal');
+            $query->condition('id', $proposal_id);
+            $query->range(0, 1);
+            $proposal_q = $query->execute();
+            $proposal_data = $proposal_q->fetchObject();
+            
+            $query = db_select('lab_migration_experiment');
+            $query->fields('lab_migration_experiment');
+            $query->condition('proposal_id', $proposal_id);
+            $query->orderBy('number', 'ASC');
+            $experiment_q = $query->execute();
+            $experiment_list = '
+      	';
+            while ($experiment_data = $experiment_q->fetchObject())
+              {
+                $experiment_list .= '<p>' . $experiment_data->number . ') ' . $experiment_data->title . '<br> Description : ' . $experiment_data->description . '<br>';
+                $experiment_list .= ' ';
+                $experiment_list .= '</p>';
+              }
             $message['headers'] = $params['solution_proposal_disapproved']['headers'];
             $message['subject'] = t('[!site_name] Lab Migration Solution Disapproval', array(
                 '!site_name' => variable_get('site_name', '')
@@ -88,9 +109,15 @@ FOSSEE,IIT Bombay', array(
                 'body' => t('
 Dear !user_name,
 
-Your Lab migration solution proposal has been disapproved.
+We regret to inform you that your Lab migration solution proposal has been disapproved.
+
+Title of Lab :' . $proposal_data->lab_title . '
+
+List of experiments : ' . $experiment_list . '
 
 Reason: ' . $params['solution_proposal_disapproved']['message'] . '
+
+You are welcome to submit a new proposal.
 
 Best Wishes,
 
@@ -112,15 +139,15 @@ FOSSEE,IIT Bombay', array(
             $query->condition('id', $params['proposal_received']['proposal_id']);
             $query->range(0, 1);
             $proposal_data = $query->execute()->fetchObject();
-           /* $samplecodefilename = "";
+            /* $samplecodefilename = "";
             if (strlen($proposal_data->samplefilepath) >= 5)
-              {
-                $samplecodefilename = substr($proposal_data->samplefilepath, strrpos($proposal_data->samplefilepath, '/') + 1);
-              }
+            {
+            $samplecodefilename = substr($proposal_data->samplefilepath, strrpos($proposal_data->samplefilepath, '/') + 1);
+            }
             else
-              {
-                $samplecodefilename = "Not provided";
-              }*/
+            {
+            $samplecodefilename = "Not provided";
+            }*/
             if ($proposal_data->solution_display == 1)
               {
                 $solution_display = 'Yes';
@@ -297,15 +324,15 @@ FOSSEE,IIT Bombay', array(
             $query->range(0, 1);
             $proposal_q = $query->execute();
             $proposal_data = $proposal_q->fetchObject();
-           /* $samplecodefilename = "";
+            /* $samplecodefilename = "";
             if (strlen($proposal_data->samplefilepath) >= 5)
-              {
-                $samplecodefilename = substr($proposal_data->samplefilepath, strrpos($proposal_data->samplefilepath, '/') + 1);
-              }
+            {
+            $samplecodefilename = substr($proposal_data->samplefilepath, strrpos($proposal_data->samplefilepath, '/') + 1);
+            }
             else
-              {
-                $samplecodefilename = "Not provided";
-              }*/
+            {
+            $samplecodefilename = "Not provided";
+            }*/
             if ($proposal_data->solution_display == 1)
               {
                 $solution_display = 'Yes';
@@ -518,7 +545,7 @@ We have received your proposal for providing solution for lab migration with the
 
 List of experiments : ' . $experiment_list . '
 
-Full Name : ' . $proposal_data->solution_provider_name_title . ' '. $proposal_data->solution_provider_name . '
+Full Name : ' . $proposal_data->solution_provider_name_title . ' ' . $proposal_data->solution_provider_name . '
 Email : ' . $user->mail . '
 Contact No. : ' . $proposal_data->solution_provider_contact_ph . '
 Department/Branch : ' . $proposal_data->department . '
