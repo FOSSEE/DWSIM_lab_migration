@@ -1110,15 +1110,17 @@ function lab_migration_proposal_edit_form_submit($form, &$form_state)
     //  );
     
     $lab_title = $v['lab_title'];
-    $proposar_name = $v['name_title']. ' ' . $v['name'];
-    $university = $v['university'];    
+    $proposar_name = $v['name_title'] . ' ' . $v['name'];
+    $university = $v['university'];
     $directory_names = _lm_dir_name($lab_title, $proposar_name, $university);
     if (LM_RenameDir($proposal_id, $directory_names))
-    {
-    $directory_name = $directory_names;
-    }else{
-    return;
-    }
+      {
+        $directory_name = $directory_names;
+      }
+    else
+      {
+        return;
+      }
     
     $query = db_update('lab_migration_proposal')->fields(array(
         'name_title' => $v['name_title'],
@@ -1132,8 +1134,8 @@ function lab_migration_proposal_edit_form_submit($form, &$form_state)
         'lab_title' => $v['lab_title'],
         'solution_display' => $solution_display,
         'directory_name' => $directory_name
-    ))->condition('id', $proposal_id);    
-    $result1 = $query->execute();    
+    ))->condition('id', $proposal_id);
+    $result1 = $query->execute();
     //$result=db_query($query, $args);
     /* updating existing experiments */
     $query = db_select('lab_migration_experiment');
@@ -1459,20 +1461,23 @@ function CreateReadmeFileLabMigration($proposal_id)
     fclose($readme_file);
     return $txt;
   }
-  function LM_RenameDir($proposal_id,$dir_name){
-    $query = db_query("SELECT directory_name FROM lab_migration_proposal WHERE id = :proposal_id", array(':proposal_id' => $proposal_id));
+function LM_RenameDir($proposal_id, $dir_name)
+  {
+    $query = db_query("SELECT directory_name FROM lab_migration_proposal WHERE id = :proposal_id", array(
+        ':proposal_id' => $proposal_id
+    ));
     $result = $query->fetchObject();
-    $new_directory_name = rename(lab_migration_path().$result->directory_name, lab_migration_path().$dir_name) or drupal_set_message("Unable to rename folder");
+    $new_directory_name = rename(lab_migration_path() . $result->directory_name, lab_migration_path() . $dir_name) or drupal_set_message("Unable to rename folder");
     
     return $new_directory_name;
     
-}
+  }
 function _lm_dir_name($lab, $name, $university)
   {
     $lab_title = ucname($lab);
     $proposar_name = ucname($name);
     $university_name = ucname($university);
-    $dir_name = $lab_title . " " . "by". " " . $proposar_name . ' ' . $university_name;
+    $dir_name = $lab_title . " " . "by" . " " . $proposar_name . ' ' . $university_name;
     $directory_name = str_replace("__", "_", str_replace(" ", "_", $dir_name));
     return $directory_name;
   }
