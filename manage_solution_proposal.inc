@@ -39,7 +39,7 @@ function lab_migration_solution_proposal_pending()
 /******************************************************************************/
 /***************** SOLUTION PROPOSAL APPROVAL FORM ****************************/
 /******************************************************************************/
-function lab_migration_solution_proposal_approval_form($form_state)
+function lab_migration_solution_proposal_approval_form($form, $form_state)
   {
     global $user;
     /* get current proposal */
@@ -69,35 +69,65 @@ function lab_migration_solution_proposal_approval_form($form_state)
         return;
       }
     $form['name'] = array(
+    '#type' => 'item',
+    '#markup' => l($proposal_data->solution_provider_name_title . ' ' . $proposal_data->solution_provider_name, 'user/' . $proposal_data->solution_provider_uid),
+    '#title' => t('Solution Provider Name'),
+  );
+  $form['email_id'] = array(
+    '#type' => 'item',
+    '#markup' => user_load($proposal_data->solution_provider_uid)->mail,
+    '#title' => t('Solution Provider Email'),
+  );
+  $form['contact_ph'] = array(
+    '#type' => 'item',
+    '#markup' => $proposal_data->solution_provider_contact_ph,
+    '#title' => t('Solution Provider Contact No.'),
+  );
+  $form['department'] = array(
+    '#type' => 'item',
+    '#markup' => $proposal_data->solution_provider_department,
+    '#title' => t('Department/Branch'),
+  );
+  $form['university'] = array(
+    '#type' => 'item',
+    '#markup' => $proposal_data->solution_provider_university,
+    '#title' => t('University/Institute'),
+  );
+
+$form['country'] = array(
         '#type' => 'item',
-        '#markup' => l($proposal_data->name_title . ' ' . $proposal_data->name, 'user/' . $proposal_data->uid),
-        '#title' => t('Proposer Name')
+        '#markup' => $proposal_data->solution_provider_country,
+        '#title' => t('Country')
     );
-    $form['email_id'] = array(
+    $form['all_state'] = array(
         '#type' => 'item',
-        '#markup' => user_load($proposal_data->uid)->mail,
-        '#title' => t('Email')
+        '#markup' => $proposal_data->solution_provider_state,
+        '#title' => t('State')
     );
-    $form['contact_ph'] = array(
+    $form['city'] = array(
         '#type' => 'item',
-        '#markup' => $proposal_data->contact_ph,
-        '#title' => t('Contact No.')
+        '#markup' => $proposal_data->solution_provider_city,
+        '#title' => t('City')
     );
-    $form['department'] = array(
+    $form['pincode'] = array(
         '#type' => 'item',
-        '#markup' => $proposal_data->department,
-        '#title' => t('Department/Branch')
+        '#markup' => $proposal_data->solution_provider_pincode,
+        '#title' => t('Pincode/Postal code')
     );
-    $form['university'] = array(
-        '#type' => 'item',
-        '#markup' => $proposal_data->university,
-        '#title' => t('University/Institute')
-    );
-    $form['lab_title'] = array(
-        '#type' => 'item',
-        '#markup' => $proposal_data->lab_title,
-        '#title' => t('Title of the Lab')
-    );
+
+
+ $form['esim_version'] = array(
+    '#type' => 'item',
+    '#title' => t('eSim version used'),
+    '#markup'=>$proposal_data->esim_version,
+  );
+
+
+  $form['lab_title'] = array(
+    '#type' => 'item',
+    '#markup' => $proposal_data->lab_title,
+    '#title' => t('Title of the Lab'),
+  );
     /* get experiment details */
     $experiment_list = '<ul>';
     //$experiment_q = db_query("SELECT * FROM {lab_migration_experiment} WHERE proposal_id = %d ORDER BY id ASC", $proposal_id);
@@ -122,7 +152,7 @@ function lab_migration_solution_proposal_approval_form($form_state)
         '#title' => t('Display the solution on the www.esim.fossee.in website'),
         '#markup' => ($proposal_data->solution_display == 1) ? "Yes" : "No"
     );
-    if ($proposal_data->solution_provider_uid == 0)
+    /*if ($proposal_data->solution_provider_uid == 0)
       {
         $solution_provider = "Open";
       }
@@ -141,12 +171,30 @@ function lab_migration_solution_proposal_approval_form($form_state)
           {
             $solution_provider = "User does not exists";
           }
-      }
-    $form['solution_provider_uid'] = array(
+      }*/
+      
+      $proposer .= '<ul>' .
+        '<li><strong>Proposer:</strong> ' . l($proposal_data->name, 'user/' . $proposal_data->uid) . '</li>' .
+        '<li><strong>Proposer Name:</strong> ' . $proposal_data->name_title . ' ' . $proposal_data->name . '</li>' .
+	'<li><strong>Contact No:</strong> ' . $proposal_data->contact_ph. '</li>' .
+	'<li><strong>Email:</strong> ' . user_load($proposal_data->uid)->mail . '</li>' .
+        '<li><strong>Department:</strong> ' . $proposal_data->department . '</li>' .
+        '<li><strong>University:</strong> ' . $proposal_data->university . '</li>' .
+        '<li><strong>Country:</strong> ' . $proposal_data->country . '</li>' .
+        '<li><strong>State:</strong> ' . $proposal_data->state . '</li>' .
+	'<li><strong>City:</strong> ' . $proposal_data->city . '</li>' .
+        '<li><strong>Pincode:</strong> ' . $proposal_data->pincode . '</li>' .
+        '</ul>';
+	$form['proposer_details'] = array(
+	  '#type' => 'item',
+		'#title' => t('Proposer of Lab :'),
+		'#markup' => $proposer,
+  	);
+    /*$form['solution_provider_uid'] = array(
         '#type' => 'item',
         '#title' => t('Solution Provider'),
         '#markup' => $solution_provider
-    );
+    );*/
     $form['approval'] = array(
         '#type' => 'radios',
         '#title' => t('Solution Provider'),
