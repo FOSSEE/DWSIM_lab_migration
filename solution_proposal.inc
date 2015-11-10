@@ -116,6 +116,97 @@ function lab_migration_solution_proposal_form($form, $form_state)
         '#maxlength' => 50,
         '#required' => TRUE
     );
+    $form['country'] = array(
+        '#type' => 'select',
+        '#title' => t('Country'),
+        '#options' => array(
+            'India' => 'India',
+            'Others' => 'Others'
+        ),
+        '#required' => TRUE,
+        '#tree' => TRUE,
+        '#validated' => TRUE
+    );
+    $form['other_country'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Other than India'),
+        '#size' => 100,
+        '#attributes' => array(
+            'placeholder' => t('Enter your country name')
+        ),
+        '#states' => array(
+            'visible' => array(
+                ':input[name="country"]' => array(
+                    'value' => 'Others'
+                )
+            )
+        )
+    );
+    $form['other_state'] = array(
+        '#type' => 'textfield',
+        '#title' => t('State other than India'),
+        '#size' => 100,
+        '#attributes' => array(
+            'placeholder' => t('Enter your state/region name')
+        ),
+        '#states' => array(
+            'visible' => array(
+                ':input[name="country"]' => array(
+                    'value' => 'Others'
+                )
+            )
+        )
+    );
+    $form['other_city'] = array(
+        '#type' => 'textfield',
+        '#title' => t('City other than India'),
+        '#size' => 100,
+        '#attributes' => array(
+            'placeholder' => t('Enter your city name')
+        ),
+        '#states' => array(
+            'visible' => array(
+                ':input[name="country"]' => array(
+                    'value' => 'Others'
+                )
+            )
+        )
+    );
+    $form['all_state'] = array(
+        '#type' => 'select',
+        '#title' => t('State'),
+        '#options' => _lm_list_of_states(),
+        '#validated' => TRUE,
+        '#states' => array(
+            'visible' => array(
+                ':input[name="country"]' => array(
+                    'value' => 'India'
+                )
+            )
+        )
+    );
+    $form['city'] = array(
+        '#type' => 'select',
+        '#title' => t('City'),
+        '#options' => _lm_list_of_cities(),
+        '#states' => array(
+            'visible' => array(
+                ':input[name="country"]' => array(
+                    'value' => 'India'
+                )
+            )
+        )
+    );
+    $form['pincode'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Pincode'),
+        '#size' => 30,
+        '#maxlength' => 6,
+        '#required' => False,
+        '#attributes' => array(
+            'placeholder' => 'Enter pincode....'
+        )
+    );
     $form['version'] = array(
         '#type' => 'select',
         '#title' => t('Version'),
@@ -145,6 +236,55 @@ function lab_migration_solution_proposal_form($form, $form_state)
 function lab_migration_solution_proposal_form_validate($form, &$form_state)
   {
     global $user;
+    if ($form_state['values']['country'] == 'Others')
+      {
+        if ($form_state['values']['other_country'] == '')
+          {
+            form_set_error('other_country', t('Enter country name'));
+            // $form_state['values']['country'] = $form_state['values']['other_country'];
+          }
+        else
+          {
+            $form_state['values']['country'] = $form_state['values']['other_country'];
+          }
+        if ($form_state['values']['other_state'] == '')
+          {
+            form_set_error('other_state', t('Enter state name'));
+            // $form_state['values']['country'] = $form_state['values']['other_country'];
+          }
+        else
+          {
+            $form_state['values']['all_state'] = $form_state['values']['other_state'];
+          }
+        if ($form_state['values']['other_city'] == '')
+          {
+            form_set_error('other_city', t('Enter city name'));
+            // $form_state['values']['country'] = $form_state['values']['other_country'];
+          }
+        else
+          {
+            $form_state['values']['city'] = $form_state['values']['other_city'];
+          }
+      }
+    else
+      {
+        if ($form_state['values']['country'] == '')
+          {
+            form_set_error('country', t('Select country name'));
+            // $form_state['values']['country'] = $form_state['values']['other_country'];
+          }
+        if ($form_state['values']['all_state'] == '')
+          {
+            form_set_error('all_state', t('Select state name'));
+            // $form_state['values']['country'] = $form_state['values']['other_country'];
+          }
+        if ($form_state['values']['city'] == '')
+          {
+            form_set_error('city', t('Select city name'));
+            // $form_state['values']['country'] = $form_state['values']['other_country'];
+          }
+      }
+    
     if ($form_state['values']['version'] == 'olderversion')
       {
         if ($form_state['values']['older'] == '')
@@ -197,17 +337,23 @@ function lab_migration_solution_proposal_form_submit($form, &$form_state)
         drupal_set_message("Someone has already applied for solving this Lab.", 'error');
         drupal_goto('lab-migration/open-proposal');
       }
-    $query = "UPDATE {lab_migration_proposal} set solution_provider_uid = :uid, solution_status = 1, version = :version, solution_provider_name_title = :solution_provider_name_title, solution_provider_name = :solution_provider_contact_name, solution_provider_contact_ph = :solution_provider_contact_ph, solution_provider_department = :solution_provider_department, solution_provider_university = :solution_provider_university WHERE id = :proposal_id";
+    $query = "UPDATE {lab_migration_proposal} set solution_provider_uid = :uid, solution_status = 1, solution_provider_name_title = :solution_provider_name_title, solution_provider_name = :solution_provider_contact_name, solution_provider_contact_ph = :solution_provider_contact_ph, solution_provider_department = :solution_provider_department, solution_provider_university = :solution_provider_university , solution_provider_city = :solution_provider_city, solution_provider_pincode = :solution_provider_pincode, solution_provider_state = :solution_provider_state,solution_provider_country = :solution_provider_country, version = :version WHERE id = :proposal_id";
     $args = array(
         ":uid" => $user->uid,
-        ":version" => $form_state['values']['version'],
         ":solution_provider_name_title" => $form_state['values']['solution_provider_name_title'],
         ":solution_provider_contact_name" => $form_state['values']['solution_provider_name'],
         ":solution_provider_contact_ph" => $form_state['values']['solution_provider_contact_ph'],
         ":solution_provider_department" => $form_state['values']['solution_provider_department'],
         ":solution_provider_university" => $form_state['values']['solution_provider_university'],
+        ":solution_provider_city" => $form_state['values']['city'],
+        ":solution_provider_pincode" => $form_state['values']['pincode'],
+        ":solution_provider_state" => $form_state['values']['all_state'],
+        ":solution_provider_country" => $form_state['values']['country'],
+        ":version" => $form_state['values']['version'],
+        
         ":proposal_id" => $proposal_id
     );
+    
     $result = db_query($query, $args);
     drupal_set_message("We have received your application. We will get back to you soon.", 'status');
     /* sending email */
