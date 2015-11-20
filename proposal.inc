@@ -26,7 +26,8 @@ function lab_migration_proposal_form($form, &$form_state)
     /************************ start approve book details ************************/
     if ($user->uid == 0) {
         $msg =  drupal_set_message(t('It is mandatory to ' . l('login', 'user') . ' on this website to access the lab proposal form. If you are new user please create a new account first.'), 'error');
-         drupal_goto('lab-migration-project');
+         //drupal_goto('lab-migration-project');
+         drupal_goto('user');
          return $msg;
     }
     $query = db_select('lab_migration_proposal');
