@@ -63,7 +63,7 @@ State : ' . $proposal_data->solution_provider_state . '
 
 List of experiments : ' . $experiment_list . '
 
-Please ensure that ALL the codes follow guidelines at http://esim.fossee.in/lab-migration-project/lab-migration-guidelines
+Please ensure that ALL the codes follow guidelines at http://dwsim.fossee.in/lab-migration/lab-migration-guidelines
 
 Best Wishes,
 
