@@ -225,7 +225,7 @@ function lab_migration_proposal_form($form, &$form_state)
     $first_experiemnt = TRUE;
     for ($counter = 1; $counter <= 15; $counter++)
       {
-        if ($counter <= 5)
+        if ($counter <= 1)
           {
             $form['lab_experiment-' . $counter] = array(
                 '#type' => 'textfield',
