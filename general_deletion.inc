@@ -53,24 +53,6 @@ function lab_migration_delete_solution($solution_id)
       drupal_set_message(t('Error deleting !file. File does not exists.', array('!file' => $dir_path)), 'error');
       continue;
     }
-    /*if (!file_exists($root_path . $solution_files_data->pdfpath))
-    {
-      $status = FALSE;
-      drupal_set_message(t('Error deleting !file. File does not exists.', array('!file' => $solution_files_data->pdfpath)), 'error');
-      continue;
-    }*/
-
-    /* Removing PDF File*/
-    $PdfStatus="";
-    if(strlen($solution_files_data->pdfpath)>=4){
-        if (!unlink($root_path . $solution_files_data->pdfpath)){
-            drupal_set_message(t('Error deleting !file', array('!file' => $solution_files_data->pdfpath)), 'error');
-    }
-        $PdfStatus=$solution_files_data->pdfpath;
-    }else{
-        $PdfStatus="PDF not uploaded";
-    }
-
     /* removing solution file */
     if (!unlink($dir_path))
     {
@@ -109,15 +91,26 @@ function lab_migration_delete_solution($solution_id)
 
   if (!$status)
     return FALSE;
-
-  /* removing code folder */
-  $query = db_select('lab_migration_proposal');
-              $query->fields('lab_migration_proposal');
-              $query->condition('id', $experiment_data->proposal_id);
-              $proposal_q = $query->execute();
-  $proposal_data = $proposal_q->fetchObject();
-  //$ex_path = $proposal_data->directory_name . '/' . $solution_files_data->filepath;
-  //$dir_path = $root_path . $ex_path;
+$query = db_select('lab_migration_solution');
+    $query->fields('lab_migration_solution');
+    $query->condition('id', $solution_id);
+    $solution_q = $query->execute();
+    $solution_data = $solution_q->fetchObject();
+    if (!$solution_data)
+      {
+        drupal_set_message(t('Invalid solution.'), 'error');
+        return FALSE;
+      }
+    $query = db_select('lab_migration_experiment');
+    $query->fields('lab_migration_experiment');
+    $query->condition('id', $solution_data->experiment_id);
+    $experiment_q = $query->execute();
+    $experiment_data = $experiment_q->fetchObject();
+    $query = db_select('lab_migration_proposal');
+    $query->fields('lab_migration_proposal');
+    $query->condition('id', $experiment_data->proposal_id);
+    $proposal_q = $query->execute();
+    $proposal_data = $proposal_q->fetchObject();
   $dir_path = $root_path . $proposal_data->directory_name . '/EXP' . $experiment_data->number . '/CODE' . $solution_data->code_number;
   //var_dump($dir_path);die;
   if (is_dir($dir_path))
@@ -162,8 +155,6 @@ function lab_migration_delete_experiment($experiment_id)
 {
   $status = TRUE;
   $root_path = lab_migration_path();
-
-  //$experiment_q = db_query("SELECT * FROM {lab_migration_experiment} WHERE id = %d", $experiment_id);
   $query = db_select('lab_migration_experiment');
               $query->fields('lab_migration_experiment');
               $query->condition('id', $experiment_id);
@@ -174,7 +165,6 @@ function lab_migration_delete_experiment($experiment_id)
     $query->condition('id', $form_state['values']['lab']);
     $proposal_q = $query->execute();
     $proposal_data = $proposal_q->fetchObject();
-
   if (!$experiment_data)
   {
     drupal_set_message('Invalid experiment.', 'error');
@@ -182,8 +172,7 @@ function lab_migration_delete_experiment($experiment_id)
   }
 
   /* deleting solutions */
-  //$solution_q = db_query("SELECT * FROM {lab_migration_solution} WHERE experiment_id = %d", $experiment_id);  
-  $query = db_select('lab_migration_solution');
+ $query = db_select('lab_migration_solution');
               $query->fields('lab_migration_solution');
               $query->condition('experiment_id', $experiment_id);
               $solution_q = $query->execute();
@@ -244,8 +233,6 @@ function lab_migration_delete_lab($lab_id)
 {
   $status = TRUE;
   $root_path = lab_migration_path();
-
-  //$proposal_q = db_query("SELECT * FROM {lab_migration_proposal} WHERE id = %d", $lab_id);
   $query = db_select('lab_migration_proposal');
               $query->fields('lab_migration_proposal');
               $query->condition('id', $lab_id);
@@ -256,15 +243,11 @@ function lab_migration_delete_lab($lab_id)
     drupal_set_message('Invalid Lab.', 'error');
     return FALSE;
   }
-
   /* delete experiments */
-  //$experiment_q = db_query("SELECT * FROM {lab_migration_experiment} WHERE proposal_id = %d", $proposal_data->id);
   $query = db_select('lab_migration_experiment');
               $query->fields('lab_migration_experiment');
               $query->condition('proposal_id', $proposal_data->id);
               $experiment_q = $query->execute();
-
-
   while ($experiment_data = $experiment_q->fetchObject())
   {
     if (!lab_migration_delete_experiment($experiment_data->id))

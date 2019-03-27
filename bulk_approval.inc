@@ -489,27 +489,7 @@ FOSSEE,IIT Bombay', array(
               }
             elseif (($form_state['values']['lab_actions'] == 3) && ($form_state['values']['lab_experiment_actions'] == 0) && ($form_state['values']['lab_experiment_solution_actions'] == 0))
               {
-                $query = db_select('lab_migration_proposal');
-                    $query->fields('lab_migration_proposal');
-                    $query->condition('id', $form_state['values']['lab']);
-                    $proposal_q = $query->execute()->fetchObject();
-                    $query = db_select('lab_migration_experiment');
-                    $query->fields('lab_migration_experiment');
-                    $query->condition('proposal_id', $form_state['values']['lab']);
-                    $experiment_q = $query->execute();
-                    $experiment_data = $experiment_q->fetchObject();
-                    $exp_path = $root_path . $proposal_q->directory_name . '/EXP' . $experiment_data->number;
-                    //$dir_path = $root_path . $proposal_q->directory_name;
-                    if (is_dir($dir_path))
-                      {
-                        //rmdir($exp_path);
-                        $res = rmdir($exp_path);
-                        if (!$res)
-                          {
-                            drupal_set_message(t("Cannot delete Lab directory : " . $dir_path . ". Please contact administrator."), 'error');
-                            return;
-                          }
-                      }
+                
                 if (strlen(trim($form_state['values']['message'])) <= 30)
                   {
                     form_set_error('message', t(''));
