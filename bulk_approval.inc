@@ -574,11 +574,14 @@ FOSSEE,IIT Bombay', array(
                 if (lab_migration_delete_lab($form_state['values']['lab']))
                   {
                     drupal_set_message(t('Dis-Approved and Deleted Entire Lab solutions.'), 'status');
-                    $query = db_select('lab_migration_experiment');
-                    $query->fields('lab_migration_experiment');
-                    $query->condition('proposal_id', $form_state['values']['lab']);
-                    $experiment_q = $query->execute()->fetchObject();
-                    $dir_path = $root_path . $experiment_q->directory_name;
+                    $query = db_select('lab_migration_proposal');
+                    $query->fields('lab_migration_proposal');
+                    $query->condition('id', $form_state['values']['lab']);
+                    $experiment_q = $query->execute();
+                    $experiment_data = $experiment_q->fetchObject();
+                    //var_dump($experiment_q);die;
+                    $dir_path = $root_path . $experiment_data->directory_name;
+                    //var_dump($experiment_data->directory_name);die;
                     if (is_dir($dir_path))
                       {
                         $res = rmdir($dir_path);
