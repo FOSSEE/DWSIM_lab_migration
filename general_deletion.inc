@@ -150,7 +150,7 @@ function lab_migration_delete_experiment($experiment_id)
     $experiment_data = $experiment_q->fetchObject();
     $query = db_select('lab_migration_proposal');
     $query->fields('lab_migration_proposal');
-    $query->condition('id', $form_state['values']['lab']);
+    $query->condition('id', $experiment_data->proposal_id);
     $proposal_q = $query->execute();
     $proposal_data = $proposal_q->fetchObject();
     if (!$experiment_data)
