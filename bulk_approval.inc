@@ -392,7 +392,7 @@ function lab_migration_bulk_approval_form_submit($form, &$form_state)
     if ($form_state['clicked_button']['#value'] == 'Submit')
       {
         if ($form_state['values']['lab'])
-            lab_migration_del_lab_pdf($form_state['values']['lab']);
+            //lab_migration_del_lab_pdf($form_state['values']['lab']);
         if (user_access('lab migration bulk manage code'))
           {
             $query = db_select('lab_migration_proposal');
