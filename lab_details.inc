@@ -18,12 +18,12 @@ function lab_migration_completed_labs_all()
         $i = 1;
         while ($row = $result->fetchObject())
           {
-            $approval_date = date("Y", $row->expected_completion_date);
+            $completion_date = date("Y", $row->expected_completion_date);
             $preference_rows[] = array(
                 $i,
                 $row->university,
-                l($row->lab_title, "lab-migration/lab-migration-run/" . $row->id),
-                $approval_date
+                $row->lab_title,
+                $completion_date
             );
             $i++;
           }
