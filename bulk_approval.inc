@@ -392,7 +392,7 @@ function lab_migration_bulk_approval_form_submit($form, &$form_state)
     if ($form_state['clicked_button']['#value'] == 'Submit')
       {
         if ($form_state['values']['lab'])
-            lab_migration_del_lab_pdf($form_state['values']['lab']);
+            //lab_migration_del_lab_pdf($form_state['values']['lab']);
         if (user_access('lab migration bulk manage code'))
           {
             $query = db_select('lab_migration_proposal');
@@ -489,6 +489,7 @@ FOSSEE,IIT Bombay', array(
               }
             elseif (($form_state['values']['lab_actions'] == 3) && ($form_state['values']['lab_experiment_actions'] == 0) && ($form_state['values']['lab_experiment_solution_actions'] == 0))
               {
+                
                 if (strlen(trim($form_state['values']['message'])) <= 30)
                   {
                     form_set_error('message', t(''));
@@ -574,13 +575,20 @@ FOSSEE,IIT Bombay', array(
                 if (lab_migration_delete_lab($form_state['values']['lab']))
                   {
                     drupal_set_message(t('Dis-Approved and Deleted Entire Lab solutions.'), 'status');
+                    $query = db_select('lab_migration_proposal');
+                    $query->fields('lab_migration_proposal');
+                    $query->condition('id', $form_state['values']['lab']);
+                    $proposal_q = $query->execute()->fetchObject();
                     $query = db_select('lab_migration_experiment');
                     $query->fields('lab_migration_experiment');
                     $query->condition('proposal_id', $form_state['values']['lab']);
-                    $experiment_q = $query->execute()->fetchObject();
-                    $dir_path = $root_path . $experiment_q->directory_name;
+                    $experiment_q = $query->execute();
+                    $experiment_data = $experiment_q->fetchObject();
+                    $exp_path = $root_path . $proposal_q->directory_name . '/EXP' . $experiment_data->number;
+                    $dir_path = $root_path . $proposal_q->directory_name;
                     if (is_dir($dir_path))
                       {
+                        rmdir($exp_path);
                         $res = rmdir($dir_path);
                         if (!$res)
                           {

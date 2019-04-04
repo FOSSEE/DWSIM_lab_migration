@@ -9,6 +9,7 @@ function lab_migration_upload_code_delete()
   global $user;
 
   $root_path = lab_migration_path();
+  //var_dump($root_path);die;
   $solution_id = (int)arg(3);
 
   /* check solution */

@@ -18,12 +18,12 @@ function lab_migration_completed_labs_all()
         $i = 1;
         while ($row = $result->fetchObject())
           {
-            $approval_date = date("Y", $row->approval_date);
+            $completion_date = date("Y", $row->expected_completion_date);
             $preference_rows[] = array(
                 $i,
                 $row->university,
-                l($row->lab_title, "lab-migration/lab-migration-run/" . $row->id),
-                $approval_date
+                $row->lab_title,
+                $completion_date
             );
             $i++;
           }
@@ -55,15 +55,29 @@ function lab_migration_labs_progress_all()
       }
     else
       {
-        //$result = db_query($query);
-        $page_content .= "<ol>";
+        $preference_rows = array();
+        $i = 1;
         while ($row = $result->fetchObject())
           {
-            $page_content .= "<li>";
-            $page_content .= $row->university . " ({$row->lab_title})";
-            $page_content .= "</li>";
+            $approval_date = date("Y", $row->approval_date);
+            $preference_rows[] = array(
+                $i,
+                $row->university,
+                $row->lab_title,
+                $approval_date
+            );
+            $i++;
           }
-        $page_content .= "</ol>";
+        $preference_header = array(
+            'No',
+            'Institute',
+            'Lab',
+            'Year'
+        );
+        $page_content .= theme('table', array(
+            'header' => $preference_header,
+            'rows' => $preference_rows
+        ));
       }
     return $page_content;
   }

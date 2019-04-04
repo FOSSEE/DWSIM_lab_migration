@@ -225,7 +225,7 @@ function lab_migration_proposal_form($form, &$form_state)
     $first_experiemnt = TRUE;
     for ($counter = 1; $counter <= 15; $counter++)
       {
-        if ($counter <= 5)
+        if ($counter <= 1)
           {
             $form['lab_experiment-' . $counter] = array(
                 '#type' => 'textfield',
@@ -576,7 +576,7 @@ function _lm_list_of_software_version()
 function _lm_dir_name($lab, $name, $university)
   {
     $lab_title = ucname($lab);
-    $proposar_name = ucname($lab);
+    $proposar_name = ucname($name);
     $university_name = ucname($university);
     $dir_name = $lab_title . " " . "by". " " . $proposar_name . ' ' . $university_name;
     $directory_name = str_replace("__", "_", str_replace(" ", "_", $dir_name));

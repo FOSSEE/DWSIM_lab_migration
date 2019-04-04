@@ -186,9 +186,9 @@ function lab_migration_upload_code_form($form,$form_state)
   $form['code_caption'] = array(
     '#type' => 'textfield',
     '#title' => t('Caption'),
+    '#description' => t('For eg: Shell & Tube Heat Exchanger Simulation'),
     '#size' => 40,
     '#maxlength' => 255,
-    '#description' => t(''),
     '#required' => TRUE,
   );
   $form['os_used'] = array(
@@ -214,7 +214,7 @@ function lab_migration_upload_code_form($form,$form_state)
   );
   $form['code_warning'] = array(
     '#type' => 'item',
-    '#title' => t('Upload all the dwsim project files in .zip format'),
+    '#title' => t('Upload all the dwsim project files in .dwxml/dwxmz format'),
     '#prefix' => '<div style="color:red">',
     '#suffix' => '</div>',
   );
