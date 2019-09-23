@@ -106,6 +106,8 @@ function lab_migration_download_full_experiment()
         header('Content-Length: ' . filesize($zip_filename));
         readfile($zip_filename);
         unlink($zip_filename);
+        ob_clean();
+        ob_flush();
       }
     else
       {
@@ -116,7 +118,7 @@ function lab_migration_download_full_experiment()
 function lab_migration_download_full_lab()
   {
     $lab_id = arg(3);
-    var_dump($lab_id);
+    //var_dump($lab_id);
     //die;
     $root_path = lab_migration_path();
     $APPROVE_PATH = 'APPROVED/';
@@ -151,6 +153,7 @@ function lab_migration_download_full_lab()
         $solution_q = $query->execute();
         while ($solution_row = $solution_q->fetchObject())
           {
+            //var_dump($solution_row);
             $CODE_PATH = 'CODE' . $solution_row->code_number . '/';
             //$solution_files_q = db_query("SELECT * FROM {lab_migration_solution_files} WHERE solution_id = %d", $solution_row->id);
             /*$query = db_select('lab_migration_solution_files');
@@ -165,6 +168,7 @@ function lab_migration_download_full_lab()
             $solution_dependency_files_q = $query->execute();
             while ($solution_files_row = $solution_files_q->fetchObject())
               {
+                //var_dump($solution_files_row);die;
                 $zip->addFile($root_path . $solution_files_row->directory_name. '/' . $solution_files_row->filepath, $APPROVE_PATH . $EXP_PATH . $CODE_PATH . $solution_files_row->filename);
               }
             /* dependency files */
