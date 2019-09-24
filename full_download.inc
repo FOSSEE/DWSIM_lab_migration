@@ -115,7 +115,7 @@ function lab_migration_download_full_lab()
         $solution_q = $query->execute();
         while ($solution_row = $solution_q->fetchObject())
           {
-            var_dump($solution_row->id);
+            //var_dump($solution_row->id);
             $CODE_PATH = 'CODE' . $solution_row->code_number . '/';
             $solution_files_q = db_query("SELECT lmsf.*, lmp.directory_name FROM lab_migration_solution_files lmsf JOIN lab_migration_solution lms JOIN lab_migration_experiment lme JOIN lab_migration_proposal lmp WHERE lms.id = lmsf.solution_id AND lme.id = lms.experiment_id AND lmp.id = lme.proposal_id AND lmsf.soultion_id = :solution_id", array(':solution_id' => $solution_row->id));
             while ($solution_files_row = $solution_files_q->fetchObject())
@@ -124,7 +124,7 @@ function lab_migration_download_full_lab()
               }
           }
           }
-      die;
+      //die;
     $zip_file_count = $zip->numFiles;
     $zip->close();
     if ($zip_file_count > 0)
