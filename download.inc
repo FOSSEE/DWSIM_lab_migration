@@ -5,7 +5,7 @@ function lab_migration_download_solution_file()
     $solution_file_id = arg(3);
     $root_path = lab_migration_path();
     // $solution_files_q = db_query("SELECT * FROM {lab_migration_solution_files} WHERE id = %d LIMIT 1", $solution_file_id);
-    $solution_files_q = db_query("SELECT lmsf.*, lmp.directory_name FROM lab_migration_solution_files lmsf JOIN lab_migration_solution lms JOIN lab_migration_experiment lme JOIN lab_migration_proposal lmp WHERE lms.id = lmsf.solution_id AND lme.id = lms.experiment_id AND lmp.id = lme.proposal_id AND lmsf.solution_id = :solution_id LIMIT 1", array(':solution_id' => $solution_file_id));
+    $solution_files_q = db_query("SELECT lmsf.*, lmp.directory_name FROM lab_migration_solution_files lmsf JOIN lab_migration_solution lms JOIN lab_migration_experiment lme JOIN lab_migration_proposal lmp WHERE lms.id = lmsf.solution_id AND lme.id = lms.experiment_id AND lmp.id = lme.proposal_id AND lmsf.id = :solution_id LIMIT 1", array(':solution_id' => $solution_file_id));
     /*$query = db_select('lab_migration_solution_files');
     $query->fields('lab_migration_solution_files');
     $query->condition('id', $solution_file_id);
