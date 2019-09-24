@@ -84,7 +84,7 @@ function lab_migration_download_full_lab()
     /* creating zip archive on the server */
     $zip = new ZipArchive;
     $zip->open($zip_filename, ZipArchive::CREATE);
-    /* approved solutions */
+    
     $query = db_select('lab_migration_experiment');
     $query->fields('lab_migration_experiment');
     $query->condition('proposal_id', $lab_id);
@@ -97,6 +97,7 @@ function lab_migration_download_full_lab()
         $query->condition('experiment_id', $experiment_row->id);
         $query->condition('approval_status', 1);
         $solution_q = $query->execute();
+        /* approved solutions */
         while ($solution_row = $solution_q->fetchObject())
           {
             $CODE_PATH = 'CODE' . $solution_row->code_number . '/';
