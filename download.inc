@@ -5,7 +5,7 @@ function lab_migration_download_solution_file()
     $solution_file_id = arg(3);
     $root_path = lab_migration_path();
     // $solution_files_q = db_query("SELECT * FROM {lab_migration_solution_files} WHERE id = %d LIMIT 1", $solution_file_id);
-    $solution_files_q = db_query("SELECT lmsf.*, lmp.directory_name FROM lab_migration_solution_files lmsf JOIN lab_migration_solution lms JOIN lab_migration_experiment lme JOIN lab_migration_proposal lmp WHERE lms.id = lmsf.solution_id AND lme.id = lms.experiment_id AND lmp.id = lme.proposal_id AND lmsf.id = :solution_id LIMIT 1", array(':solution_id' => $solution_file_id));
+    $solution_files_q = db_query("SELECT lmsf.*, lmp.directory_name FROM lab_migration_solution_files lmsf JOIN lab_migration_solution lms JOIN lab_migration_experiment lme JOIN lab_migration_proposal lmp WHERE lms.id = lmsf.solution_id AND lme.id = lms.experiment_id AND lmp.id = lme.proposal_id AND lmsf.solution_id = :solution_id LIMIT 1", array(':solution_id' => $solution_file_id));
     /*$query = db_select('lab_migration_solution_files');
     $query->fields('lab_migration_solution_files');
     $query->condition('id', $solution_file_id);
@@ -55,7 +55,7 @@ function lab_migration_download_solution()
     $query->fields('lab_migration_solution_files');
     $query->condition('solution_id', $solution_id);
     $solution_files_q = $query->execute();*/
-    $solution_files_q = db_query("SELECT lmsf.*, lmp.directory_name FROM lab_migration_solution_files lmsf JOIN lab_migration_solution lms JOIN lab_migration_experiment lme JOIN lab_migration_proposal lmp WHERE lms.id = lmsf.solution_id AND lme.id = lms.experiment_id AND lmp.id = lme.proposal_id AND lmsf.id = :solution_id", array(':solution_id' => $solution_id));
+    $solution_files_q = db_query("SELECT lmsf.*, lmp.directory_name FROM lab_migration_solution_files lmsf JOIN lab_migration_solution lms JOIN lab_migration_experiment lme JOIN lab_migration_proposal lmp WHERE lms.id = lmsf.solution_id AND lme.id = lms.experiment_id AND lmp.id = lme.proposal_id AND lmsf.solution_id = :solution_id", array(':solution_id' => $solution_id));
     //$solution_dependency_files_q = db_query("SELECT * FROM {lab_migration_solution_dependency} WHERE solution_id = %d", $solution_id);
     $query = db_select('lab_migration_solution_dependency');
     $query->fields('lab_migration_solution_dependency');
@@ -213,7 +213,7 @@ function lab_migration_download_lab()
             $CODE_PATH = 'CODE' . $solution_row->code_number . '/';
             //$solution_files_q = db_query("SELECT * FROM {lab_migration_solution_files} WHERE solution_id = %d", $solution_row->id);
             
-            $solution_files_q = db_query("SELECT lmsf.*, lmp.directory_name FROM lab_migration_solution_files lmsf JOIN lab_migration_solution lms JOIN lab_migration_experiment lme JOIN lab_migration_proposal lmp WHERE lms.id = lmsf.solution_id AND lme.id = lms.experiment_id AND lmp.id = lme.proposal_id AND lmsf.id = :solution_id", array(':solution_id' => $solution_row->id));
+            $solution_files_q = db_query("SELECT lmsf.*, lmp.directory_name FROM lab_migration_solution_files lmsf JOIN lab_migration_solution lms JOIN lab_migration_experiment lme JOIN lab_migration_proposal lmp WHERE lms.id = lmsf.solution_id AND lme.id = lms.experiment_id AND lmp.id = lme.proposal_id AND lmsf.solution_id = :solution_id", array(':solution_id' => $solution_row->id));
             /*$query = db_select('lab_migration_solution_files');
             $query->fields('lab_migration_solution_files');
             $query->condition('solution_id', $solution_row->id);
