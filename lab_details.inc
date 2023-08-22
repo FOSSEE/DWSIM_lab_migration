@@ -56,7 +56,7 @@ function lab_migration_labs_progress_all()
     else
       {
         $preference_rows = array();
-        $i = 1;
+        $i = $result->rowCount();
         while ($row = $result->fetchObject())
           {
             $approval_date = date("Y", $row->approval_date);
@@ -66,7 +66,7 @@ function lab_migration_labs_progress_all()
                 $row->lab_title,
                 $approval_date
             );
-            $i++;
+            $i--;
           }
         $preference_header = array(
             'No',
