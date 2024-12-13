@@ -6,6 +6,7 @@ function lab_migration_completed_labs_all()
     $query = db_select('lab_migration_proposal');
     $query->fields('lab_migration_proposal');
     $query->condition('approval_status', 3);
+    $query->orderBy('expected_completion_date','DESC');
     $result = $query->execute();
     //$result = db_query($query);
     if ($result->rowCount() == 0)
@@ -48,6 +49,7 @@ function lab_migration_labs_progress_all()
     $query->fields('lab_migration_proposal');
     $query->condition('approval_status', 1);
     $query->condition('solution_status', 2);
+    $query->orderBy('approval_date','DESC');
     $result = $query->execute();
     if ($result->rowCount() == 0)
       {
